@@ -14,7 +14,8 @@
         "clean": "rimraf dist .turbo"
     },
     "dependencies": {
-        "@abap/types": "workspace:*"
+        "@abap/types": "workspace:*",
+        "zod": "^3.23.8"
     },
     "devDependencies": {
         "rimraf": "^6.0.1",

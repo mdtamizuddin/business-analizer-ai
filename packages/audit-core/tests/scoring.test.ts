@@ -18,9 +18,9 @@ describe('calculateOverallScore', () => {
   });
 
   it('should weight branding more than social_media', () => {
-    const brandingOnly = calculateOverallScore({ branding: 100 });
-    const socialOnly = calculateOverallScore({ social_media: 100 });
-    expect(brandingOnly).toBeGreaterThan(socialOnly);
+    const brandingImpact = calculateOverallScore({ branding: 50, seo: 100 });
+    const socialImpact = calculateOverallScore({ social_media: 50, seo: 100 });
+    expect(brandingImpact).toBeLessThan(socialImpact);
   });
 });
 
