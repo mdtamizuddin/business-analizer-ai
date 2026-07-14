@@ -1,0 +1,20 @@
+# Dependencies
+node_modules
+.pnp
+
+# Build outputs
+dist
+.next
+out
+build
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Turbo
+.turbo
+
+# Logs
+*.log
