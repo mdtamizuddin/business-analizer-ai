@@ -1,4 +1,4 @@
-import type { AIModelTier } from '@abap/types';
+import { AIModelTier } from '@abap/types';
 
 export interface PromptTemplate {
   name: string;
@@ -12,7 +12,7 @@ export interface PromptTemplate {
 export const SEO_ANALYSIS_PROMPT: PromptTemplate = {
   name: 'seo-analysis',
   version: '1.0.0',
-  tier: 'cheap',
+  tier: AIModelTier.CHEAP,
   system: `You are an SEO expert analyst. You analyze website crawl data and produce structured SEO assessment scores and issues.`,
   user: `Analyze the following website crawl data and provide an SEO assessment.
 
@@ -54,7 +54,7 @@ Return ONLY valid JSON matching this structure:
 export const PERFORMANCE_ANALYSIS_PROMPT: PromptTemplate = {
   name: 'performance-analysis',
   version: '1.0.0',
-  tier: 'cheap',
+  tier: AIModelTier.CHEAP,
   system: `You are a web performance expert. You analyze Lighthouse and Core Web Vitals data to produce a structured performance assessment.`,
   user: `Analyze the following Lighthouse and performance data for {{companyName}} ({{websiteUrl}}).
 
@@ -84,7 +84,7 @@ Return ONLY valid JSON matching this structure:
 export const BRANDING_ANALYSIS_PROMPT: PromptTemplate = {
   name: 'branding-analysis',
   version: '1.0.0',
-  tier: 'cheap',
+  tier: AIModelTier.CHEAP,
   system: `You are a branding and design expert. You analyze website visual data to produce a structured branding assessment.`,
   user: `Analyze the following website branding data for {{companyName}} ({{websiteUrl}}).
 
@@ -107,7 +107,7 @@ Return ONLY valid JSON matching this structure:
 export const RECOMMENDATIONS_PROMPT: PromptTemplate = {
   name: 'recommendations',
   version: '1.0.0',
-  tier: 'premium',
+  tier: AIModelTier.PREMIUM,
   system: `You are a senior digital business consultant. You analyze audit results and produce actionable business recommendations with clear priorities, effort estimates, ROI projections, and recommended agency services.`,
   user: `Based on the following audit results for {{companyName}} ({{websiteUrl}}), generate strategic business recommendations.
 
@@ -142,7 +142,7 @@ Return ONLY a valid JSON array of recommendation objects.`,
 export const EXECUTIVE_SUMMARY_PROMPT: PromptTemplate = {
   name: 'executive-summary',
   version: '1.0.0',
-  tier: 'premium',
+  tier: AIModelTier.PREMIUM,
   system: `You are an executive business consultant. You produce concise, impactful executive summaries from audit data.`,
   user: `Create an executive summary for the business audit of {{companyName}} ({{websiteUrl}}).
 

@@ -110,7 +110,7 @@ export type BrandingAnalysisOutput = z.infer<typeof brandingAnalysisSchema>;
 
 export const aiResponseSchema = z.object({
   content: z.string(),
-  provider: z.enum(['gemini', 'groq', 'openai']),
+  provider: z.enum(['gemini', 'groq']),
   model: z.string(),
   tokensUsed: z.number(),
   costEstimate: z.number(),

@@ -1,6 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [".env", "tsconfig.base.json"],
+  "globalDependencies": [
+    ".env",
+    "tsconfig.base.json"
+  ],
   "globalEnv": [
     "NODE_ENV",
     "MONGODB_URI",
@@ -9,7 +12,6 @@
     "JWT_REFRESH_SECRET",
     "GEMINI_API_KEY",
     "GROQ_API_KEY",
-    "OPENAI_API_KEY",
     "S3_BUCKET",
     "S3_REGION",
     "S3_ACCESS_KEY_ID",
@@ -22,18 +24,32 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
     },
     "type-check": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "clean": {
       "cache": false

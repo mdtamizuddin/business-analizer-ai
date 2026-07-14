@@ -60,7 +60,6 @@ export enum AIModelTier {
 export enum AIProvider {
   GEMINI = 'gemini',
   GROQ = 'groq',
-  OPENAI = 'openai',
 }
 
 export enum LeadStatus {

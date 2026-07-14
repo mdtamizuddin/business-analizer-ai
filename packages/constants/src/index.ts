@@ -125,13 +125,10 @@ export const REDIS_KEYS = {
 export const AI_COST_PER_1K_TOKENS: Record<string, { input: number; output: number }> = {
   'gemini-1.5-flash': { input: 0.000075, output: 0.0003 },
   'gemini-1.5-pro': { input: 0.00125, output: 0.005 },
-  'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
-  'gpt-4o': { input: 0.0025, output: 0.01 },
-  'claude-3-haiku': { input: 0.00025, output: 0.00125 },
-  'claude-3-sonnet': { input: 0.003, output: 0.015 },
+  'llama-3.3-70b-versatile': { input: 0.00059, output: 0.00079 },
 };
 
 export const AI_MODEL_TIER_MAP = {
-  cheap: ['gemini-1.5-flash', 'gpt-4o-mini', 'claude-3-haiku'],
-  premium: ['gemini-1.5-pro', 'gpt-4o', 'claude-3-sonnet'],
+  cheap: ['gemini-1.5-flash', 'llama-3.3-70b-versatile'],
+  premium: ['gemini-1.5-pro', 'llama-3.3-70b-versatile'],
 } as const;

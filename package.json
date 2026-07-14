@@ -10,7 +10,13 @@
     "test": "turbo test",
     "type-check": "turbo type-check",
     "clean": "turbo clean && rimraf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps",
+    "docker:reset": "docker compose down -v && docker compose up -d --build"
   },
   "devDependencies": {
     "prettier": "^3.3.3",

@@ -24,21 +24,55 @@ abap/
 
 ## Getting Started
 
+### Option 1: Docker (recommended)
+
+```bash
+# Copy environment file and add your API keys
+cp .env.example .env
+
+# Build and start all services (MongoDB, Redis, API, Web)
+pnpm docker:up --build
+
+# View logs
+pnpm docker:logs
+
+# Stop everything
+pnpm docker:down
+```
+
+This starts:
+- MongoDB on `localhost:27017`
+- Redis on `localhost:6379`
+- API on `localhost:3000`
+- Web on `localhost:3001`
+
+### Option 2: Local development
+
+Prerequisites: MongoDB, Redis, and Playwright browsers installed.
+
 ```bash
 # Install dependencies
 pnpm install
 
+# Install Playwright browser
+pnpm --filter @abap/api exec playwright install chromium
+
 # Run all apps in dev mode
 pnpm dev
+```
 
-# Build all packages
-pnpm build
+### Available scripts
 
-# Run linting
-pnpm lint
-
-# Run type checking
-pnpm type-check
+```bash
+pnpm dev          # Start API + Web in dev mode
+pnpm build        # Build all packages
+pnpm lint         # Run ESLint
+pnpm test         # Run tests
+pnpm type-check   # TypeScript type checking
+pnpm docker:up    # Start all Docker services
+pnpm docker:down  # Stop all Docker services
+pnpm docker:logs  # Follow Docker logs
+pnpm docker:reset # Full reset — remove volumes and rebuild
 ```
 
 ## Tech Stack

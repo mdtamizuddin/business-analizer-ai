@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
 const config: NextConfig = {
+  output: 'standalone',
   transpilePackages: ['@abap/types', '@abap/constants', '@abap/ui'],
   experimental: {
     typedRoutes: true,
