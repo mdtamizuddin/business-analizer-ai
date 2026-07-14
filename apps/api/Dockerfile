@@ -5,6 +5,9 @@ RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
 
+# Hoisted node-linker so all binaries are in root node_modules/.bin
+RUN echo "node-linker=hoisted" > .npmrc
+
 # Copy workspace root config
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json tsconfig.base.json ./
 
@@ -25,15 +28,8 @@ RUN pnpm install --frozen-lockfile
 COPY apps/api ./apps/api
 COPY packages ./packages
 
-# Build shared packages first, then the API
-RUN pnpm --filter @abap/types build && \
-    pnpm --filter @abap/schemas build && \
-    pnpm --filter @abap/constants build && \
-    pnpm --filter @abap/config build && \
-    pnpm --filter @abap/prompts build && \
-    pnpm --filter @abap/audit-core build && \
-    pnpm --filter @abap/ui build && \
-    pnpm --filter @abap/api build
+# Build API and all its workspace dependencies in topological order
+RUN pnpm exec turbo build --filter=@abap/api...
 
 # ---- Production stage ----
 FROM node:24-alpine AS runner
@@ -41,6 +37,8 @@ FROM node:24-alpine AS runner
 RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
+
+RUN echo "node-linker=hoisted" > .npmrc
 
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/api/package.json ./apps/api/

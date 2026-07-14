@@ -5,6 +5,8 @@ RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
 
+RUN echo "node-linker=hoisted" > .npmrc
+
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json tsconfig.base.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/types/package.json ./packages/types/
@@ -19,11 +21,8 @@ COPY packages ./packages
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN pnpm --filter @abap/types build && \
-    pnpm --filter @abap/constants build && \
-    pnpm --filter @abap/config build && \
-    pnpm --filter @abap/ui build && \
-    pnpm --filter @abap/web build
+# Build web and its workspace dependencies in topological order
+RUN pnpm exec turbo build --filter=@abap/web...
 
 # ---- Production stage ----
 FROM node:24-alpine AS runner
