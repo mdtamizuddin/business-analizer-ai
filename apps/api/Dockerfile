@@ -5,9 +5,6 @@ RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
 
-# Hoisted node-linker so all binaries are in root node_modules/.bin
-RUN echo "node-linker=hoisted" > .npmrc
-
 # Copy workspace root config
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json tsconfig.base.json ./
 
@@ -21,8 +18,8 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/prompts/package.json ./packages/prompts/
 COPY packages/audit-core/package.json ./packages/audit-core/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install with shamefully-hoist for flat node_modules (npm-like layout)
+RUN pnpm install --frozen-lockfile --shamefully-hoist
 
 # Copy source code
 COPY apps/api ./apps/api
@@ -38,8 +35,6 @@ RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
 
 WORKDIR /app
 
-RUN echo "node-linker=hoisted" > .npmrc
-
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/api/package.json ./apps/api/
 COPY packages/types/package.json ./packages/types/
@@ -50,7 +45,7 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/prompts/package.json ./packages/prompts/
 COPY packages/audit-core/package.json ./packages/audit-core/
 
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --shamefully-hoist --prod
 
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/packages/types/dist ./packages/types/dist
