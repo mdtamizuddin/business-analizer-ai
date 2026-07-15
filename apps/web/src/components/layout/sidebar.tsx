@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Building2, PlusCircle, Users, Swords, Share2, MapPin } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { LayoutDashboard, Building2, PlusCircle, Users, Swords, Share2, MapPin, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getUser, clearSession } from '@/lib/auth';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -17,6 +18,13 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const user = getUser();
+
+  function handleLogout() {
+    clearSession();
+    router.push('/login');
+  }
 
   return (
     <aside className="flex h-screen w-60 flex-col border-r border-border bg-surface">
@@ -50,8 +58,19 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-border p-4">
-        <p className="text-xs text-text-secondary">AI Business Audit Platform</p>
-        <p className="text-xs text-text-secondary/70 mt-1">AI Growth Intelligence</p>
+        {user && (
+          <p className="text-xs font-medium text-text-primary truncate">{user.name}</p>
+        )}
+        <div className="mt-2 flex items-center justify-between">
+          <p className="text-xs text-text-secondary/70">AI Growth Intelligence</p>
+          <button
+            onClick={handleLogout}
+            title="Sign out"
+            className="rounded-md p-1.5 text-text-secondary transition hover:bg-surface-hover hover:text-danger"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </aside>
   );
