@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Building2, PlusCircle } from 'lucide-react';
+import { LayoutDashboard, Building2, PlusCircle, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/audits/new', label: 'New Audit', icon: PlusCircle },
   { href: '/companies', label: 'Companies', icon: Building2 },
+  { href: '/leads', label: 'Leads', icon: Users },
 ];
 
 export function Sidebar() {
