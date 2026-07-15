@@ -12,6 +12,7 @@ const config: Config = {
         background: '#080B16',
         surface: '#111827',
         'surface-hover': '#1A2236',
+        elevated: '#1A2236',
         border: '#263247',
         primary: {
           DEFAULT: '#4F8CFF',
@@ -27,6 +28,7 @@ const config: Config = {
           900: '#243f7a',
         },
         secondary: '#8B5CF6',
+        'ai-premium': '#EC4899',
         success: '#22C55E',
         warning: '#F59E0B',
         danger: '#EF4444',
