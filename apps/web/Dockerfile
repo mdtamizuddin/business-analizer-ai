@@ -19,6 +19,10 @@ COPY packages ./packages
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV CI=true
+# NEXT_PUBLIC_* vars are inlined at build time, so they must be set before the
+# build runs, not supplied at container start. Default to the VPS API endpoint.
+ARG NEXT_PUBLIC_API_URL=http://72.60.34.190:3000/api/v1
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 RUN pnpm exec turbo build --filter=@abap/web...
 

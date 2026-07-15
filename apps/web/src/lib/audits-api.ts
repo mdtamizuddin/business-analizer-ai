@@ -33,6 +33,34 @@ export interface SeoAnalysis {
   issues: string[];
 }
 
+export interface PerformanceAnalysis {
+  lighthouseScore: number;
+  performanceScore: number;
+  accessibilityScore: number;
+  bestPracticesScore: number;
+  seoScore: number;
+  coreWebVitals: {
+    lcp?: number;
+    fid?: number;
+    cls?: number;
+    fcp?: number;
+    ttfb?: number;
+    tbt?: number;
+    si?: number;
+  };
+  issues: string[];
+}
+
+export interface BrandingAnalysis {
+  colorsDetected: string[];
+  fontsDetected: string[];
+  logoPresent: boolean;
+  hasFavicon: boolean;
+  imageCount: number;
+  totalImages: number;
+  issues: string[];
+}
+
 export interface Audit {
   _id: string;
   companyId: string;
@@ -61,8 +89,11 @@ export interface Audit {
     }>;
   };
   seoAnalysis?: SeoAnalysis;
+  performanceAnalysis?: PerformanceAnalysis;
+  brandingAnalysis?: BrandingAnalysis;
   scores?: AuditScores;
   recommendations: AuditRecommendation[];
+  executiveSummary?: string;
   error?: string;
   createdAt: string;
   updatedAt: string;

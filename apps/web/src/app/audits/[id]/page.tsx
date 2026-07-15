@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, AlertCircle, Loader2, ExternalLink, Clock } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Loader2, ExternalLink, Clock, Type, Image as ImageIcon, CheckCircle2, XCircle } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { auditsApi, type Audit } from '@/lib/audits-api';
 import { companiesApi, type Company } from '@/lib/companies-api';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -13,6 +14,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { STAGE_LABELS, SCORE_CATEGORY_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+
+function scoreColor(score: number): string {
+  if (score >= 80) return '#22c55e';
+  if (score >= 60) return '#eab308';
+  return '#ef4444';
+}
 
 const STAGES = [
   'company_discovery',
@@ -176,10 +183,10 @@ export default function AuditDetailPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Category Scores</CardTitle>
-            <CardDescription>Weighted breakdown of digital health</CardDescription>
+            <CardDescription>Weighted breakdown of digital health · Overall {audit.scores.overall}/100</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
               {Object.entries(audit.scores.categories).map(([key, score]) => (
                 <div key={key} className="flex flex-col items-center gap-1">
                   <ScoreCircle score={score} size="sm" />
@@ -188,6 +195,20 @@ export default function AuditDetailPage() {
                   </span>
                 </div>
               ))}
+            </div>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={Object.entries(audit.scores.categories).map(([key, score]) => ({ name: SCORE_CATEGORY_LABELS[key] ?? key, score }))}>
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Bar dataKey="score" radius={[4, 4, 0, 0]}>
+                    {Object.entries(audit.scores.categories).map(([, score]) => (
+                      <Cell key={score} fill={scoreColor(score)} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
@@ -271,6 +292,128 @@ export default function AuditDetailPage() {
               <div className="space-y-1">
                 <p className="text-sm font-medium text-slate-700 mb-2">Issues Found:</p>
                 {audit.seoAnalysis.issues.map((issue, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                    <span className="mt-0.5 text-red-400">•</span>
+                    {issue}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Executive Summary */}
+      {audit.executiveSummary && (
+        <Card className="mb-6 border-brand-200 bg-brand-50/40">
+          <CardHeader>
+            <CardTitle>Executive Summary</CardTitle>
+            <CardDescription>AI-generated strategic overview</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-sm max-w-none whitespace-pre-wrap text-sm text-slate-700">
+              {audit.executiveSummary}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Performance Analysis */}
+      {audit.performanceAnalysis && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Performance Analysis</CardTitle>
+            <CardDescription>Core Web Vitals &amp; load performance</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              {[
+                ['Lighthouse', audit.performanceAnalysis.lighthouseScore],
+                ['Performance', audit.performanceAnalysis.performanceScore],
+                ['Accessibility', audit.performanceAnalysis.accessibilityScore],
+                ['Best Practices', audit.performanceAnalysis.bestPracticesScore],
+              ].map(([label, score]) => (
+                <div key={label as string} className="flex flex-col items-center gap-1 rounded-lg border border-slate-200 px-3 py-3">
+                  <ScoreCircle score={score as number} size="sm" />
+                  <span className="text-xs text-slate-600">{label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+              {[
+                ['LCP', audit.performanceAnalysis.coreWebVitals.lcp, 'ms'],
+                ['FCP', audit.performanceAnalysis.coreWebVitals.fcp, 'ms'],
+                ['CLS', audit.performanceAnalysis.coreWebVitals.cls, ''],
+                ['TTFB', audit.performanceAnalysis.coreWebVitals.ttfb, 'ms'],
+                ['TBT', audit.performanceAnalysis.coreWebVitals.tbt, 'ms'],
+                ['SI', audit.performanceAnalysis.coreWebVitals.si, 'ms'],
+              ].map(([label, value, unit]) => (
+                <div key={label as string} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                  <span className="text-xs text-slate-600">{label}</span>
+                  <span className="text-sm font-bold text-slate-900">
+                    {value === undefined || value === null ? '—' : `${Math.round(value as number)}${unit}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {audit.performanceAnalysis.issues.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-slate-700 mb-2">Issues Found:</p>
+                {audit.performanceAnalysis.issues.map((issue, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                    <span className="mt-0.5 text-red-400">•</span>
+                    {issue}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Branding Analysis */}
+      {audit.brandingAnalysis && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Branding Analysis</CardTitle>
+            <CardDescription>Visual identity signals</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+                {audit.brandingAnalysis.logoPresent ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                <span className="text-xs text-slate-600">Logo</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+                {audit.brandingAnalysis.hasFavicon ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                <span className="text-xs text-slate-600">Favicon</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+                <ImageIcon className="h-4 w-4 text-slate-400" />
+                <span className="text-xs text-slate-600">{audit.brandingAnalysis.imageCount} homepage imgs</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+                <Type className="h-4 w-4 text-slate-400" />
+                <span className="text-xs text-slate-600">{audit.brandingAnalysis.fontsDetected.length} brand fonts</span>
+              </div>
+            </div>
+            {audit.brandingAnalysis.colorsDetected.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs font-medium text-slate-600 mb-2">Detected Colors</p>
+                <div className="flex flex-wrap gap-2">
+                  {audit.brandingAnalysis.colorsDetected.map((c) => (
+                    <div key={c} className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-2 py-1">
+                      <span className="h-4 w-4 rounded border border-slate-300" style={{ backgroundColor: c }} />
+                      <span className="text-xs text-slate-500">{c}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {audit.brandingAnalysis.issues.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-slate-700 mb-2">Issues Found:</p>
+                {audit.brandingAnalysis.issues.map((issue, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
                     <span className="mt-0.5 text-red-400">•</span>
                     {issue}
