@@ -9,6 +9,7 @@ import { AuditsModule } from './modules/audits/audits.module';
 import { CrawlerModule } from './modules/crawler/crawler.module';
 import { SeoModule } from './modules/seo/seo.module';
 import { AiModule } from './modules/ai/ai.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AiModule } from './modules/ai/ai.module';
     SeoModule,
     AiModule,
     AuditsModule,
+    AuthModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
