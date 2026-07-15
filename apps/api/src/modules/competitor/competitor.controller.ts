@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { CompetitorService } from './competitor.service';
+import { CompetitorService, CompetitorAnalysisResult } from './competitor.service';
 import { AnalyzeCompetitorDto } from './dto/competitor.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -11,7 +11,7 @@ export class CompetitorController {
   ) {}
 
   @Post('analyze')
-  async analyze(@Body() dto: AnalyzeCompetitorDto) {
+  async analyze(@Body() dto: AnalyzeCompetitorDto): Promise<CompetitorAnalysisResult> {
     return this.competitorService.analyze(dto.competitorUrl);
   }
 }

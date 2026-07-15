@@ -14,6 +14,10 @@ import { LeadsModule } from './modules/leads/leads.module';
 import { CompetitorModule } from './modules/competitor/competitor.module';
 import { SocialModule } from './modules/social/social.module';
 import { GoogleBusinessModule } from './modules/google-business/google-business.module';
+import { AccessibilityModule } from './modules/accessibility/accessibility.module';
+import { SecurityModule } from './modules/security/security.module';
+import { TechnologyModule } from './modules/technology/technology.module';
+import { CacheModule } from './modules/cache/cache.module';
 
 @Module({
   imports: [
@@ -32,6 +36,7 @@ import { GoogleBusinessModule } from './modules/google-business/google-business.
       }),
     }),
     ThrottlerModule.forRoot({ throttlers: [{ ttl: 60000, limit: 100 }] }),
+    CacheModule,
     CompaniesModule,
     CrawlerModule,
     SeoModule,
@@ -42,7 +47,10 @@ import { GoogleBusinessModule } from './modules/google-business/google-business.
     CompetitorModule,
     SocialModule,
     GoogleBusinessModule,
+    AccessibilityModule,
+    SecurityModule,
+    TechnologyModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
-export class AppModule { }
+export class AppModule {}

@@ -13,6 +13,9 @@ import { CrawlerModule } from '../crawler/crawler.module';
 import { SeoModule } from '../seo/seo.module';
 import { PerformanceModule } from '../performance/performance.module';
 import { BrandingModule } from '../branding/branding.module';
+import { AccessibilityModule } from '../accessibility/accessibility.module';
+import { SecurityModule } from '../security/security.module';
+import { TechnologyModule } from '../technology/technology.module';
 import { AiModule } from '../ai/ai.module';
 import { LeadsModule } from '../leads/leads.module';
 import { SocialModule } from '../social/social.module';
@@ -27,6 +30,9 @@ import { CompetitorModule } from '../competitor/competitor.module';
     SeoModule,
     PerformanceModule,
     BrandingModule,
+    AccessibilityModule,
+    SecurityModule,
+    TechnologyModule,
     AiModule,
     LeadsModule,
     SocialModule,

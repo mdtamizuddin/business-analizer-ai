@@ -34,6 +34,15 @@ export class Audit {
   brandingAnalysis?: any;
 
   @Prop({ type: Object })
+  accessibilityAnalysis?: any;
+
+  @Prop({ type: Object })
+  securityAnalysis?: any;
+
+  @Prop({ type: Object })
+  technologyDetection?: any;
+
+  @Prop({ type: Object })
   companyDiscovery?: any;
 
   @Prop({ type: Object })

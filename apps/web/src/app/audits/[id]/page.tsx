@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, AlertCircle, Loader2, ExternalLink, Clock, Type, Image as ImageIcon, CheckCircle2, XCircle, FileDown, FileText } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Loader2, ExternalLink, Clock, Type, Image as ImageIcon, CheckCircle2, XCircle, FileDown, FileText, Eye, Shield, Cpu } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { auditsApi, type Audit } from '@/lib/audits-api';
 import { companiesApi, type Company } from '@/lib/companies-api';
@@ -550,6 +550,154 @@ export default function AuditDetailPage() {
                     {issue}
                   </div>
                 ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Accessibility Analysis */}
+      {audit.accessibilityAnalysis && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="h-4 w-4 text-blue-400" /> Accessibility Analysis
+            </CardTitle>
+            <CardDescription>Overall score: {audit.accessibilityAnalysis.overallScore}/100</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+              {[
+                ['Alt Text', audit.accessibilityAnalysis.altTextScore],
+                ['Language', audit.accessibilityAnalysis.langScore],
+                ['ARIA', audit.accessibilityAnalysis.ariaScore],
+                ['Skip Link', audit.accessibilityAnalysis.skipLinkScore],
+                ['Heading Structure', audit.accessibilityAnalysis.headingStructureScore],
+                ['Contrast', audit.accessibilityAnalysis.contrastScore],
+              ].map(([label, score]) => (
+                <div key={label as string} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                  <span className="text-xs text-slate-300">{label}</span>
+                  <span className={cn(
+                    'text-sm font-bold',
+                    (score as number) >= 80 ? 'text-green-600' : (score as number) >= 60 ? 'text-yellow-600' : 'text-red-600',
+                  )}>
+                    {score}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {audit.accessibilityAnalysis.issues.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-slate-200 mb-2">Issues Found:</p>
+                {audit.accessibilityAnalysis.issues.map((issue, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-300">
+                    <span className="mt-0.5 text-red-400">•</span>
+                    {issue}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Security Analysis */}
+      {audit.securityAnalysis && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-green-400" /> Security Analysis
+            </CardTitle>
+            <CardDescription>Overall score: {audit.securityAnalysis.overallScore}/100</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+              {[
+                ['SSL/TLS', audit.securityAnalysis.sslScore],
+                ['HSTS', audit.securityAnalysis.hstsScore],
+                ['XSS Protection', audit.securityAnalysis.xssProtectionScore],
+                ['Content-Type Options', audit.securityAnalysis.contentTypeOptionsScore],
+                ['Frame Options', audit.securityAnalysis.frameOptionsScore],
+                ['CSP', audit.securityAnalysis.cspScore],
+              ].map(([label, score]) => (
+                <div key={label as string} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                  <span className="text-xs text-slate-300">{label}</span>
+                  <span className={cn(
+                    'text-sm font-bold',
+                    (score as number) >= 80 ? 'text-green-600' : (score as number) >= 60 ? 'text-yellow-600' : 'text-red-600',
+                  )}>
+                    {score}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {audit.securityAnalysis.issues.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-slate-200 mb-2">Issues Found:</p>
+                {audit.securityAnalysis.issues.map((issue, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-300">
+                    <span className="mt-0.5 text-red-400">•</span>
+                    {issue}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Technology Detection */}
+      {audit.technologyDetection && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Cpu className="h-4 w-4 text-purple-400" /> Technology Detection
+            </CardTitle>
+            <CardDescription>Frameworks, libraries &amp; infrastructure detected</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="rounded-lg border border-border px-3 py-2">
+                <p className="text-xs text-slate-400">CMS</p>
+                <p className="text-sm font-semibold text-text-primary">{audit.technologyDetection.cms ?? 'Not detected'}</p>
+              </div>
+              <div className="rounded-lg border border-border px-3 py-2">
+                <p className="text-xs text-slate-400">Hosting</p>
+                <p className="text-sm font-semibold text-text-primary">{audit.technologyDetection.hosting ?? 'Not detected'}</p>
+              </div>
+              <div className="rounded-lg border border-border px-3 py-2">
+                <p className="text-xs text-slate-400">CDN</p>
+                <p className="text-sm font-semibold text-text-primary">{audit.technologyDetection.cdn ?? 'Not detected'}</p>
+              </div>
+            </div>
+            {audit.technologyDetection.frameworks.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs font-medium text-slate-300 mb-1">Frameworks</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {audit.technologyDetection.frameworks.map((f) => (
+                    <span key={f} className="rounded-md bg-primary/10 px-2 py-0.5 text-xs text-primary">{f}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {audit.technologyDetection.libraries.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs font-medium text-slate-300 mb-1">Libraries</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {audit.technologyDetection.libraries.map((l) => (
+                    <span key={l} className="rounded-md bg-secondary/10 px-2 py-0.5 text-xs text-secondary">{l}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {audit.technologyDetection.analytics.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs font-medium text-slate-300 mb-1">Analytics</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {audit.technologyDetection.analytics.map((a) => (
+                    <span key={a} className="rounded-md bg-warning/10 px-2 py-0.5 text-xs text-warning">{a}</span>
+                  ))}
+                </div>
               </div>
             )}
           </CardContent>

@@ -50,9 +50,9 @@ export class AuditsController {
 
     const company = await this.companiesService.findById(audit.companyId);
     const html = this.reportService.buildHtml({
-      companyName: (company as any)?.name ?? 'Company',
-      website: (company as any)?.website ?? '',
-      industry: (company as any)?.industry,
+      companyName: company?.name ?? 'Company',
+      website: company?.website ?? '',
+      industry: company?.industry,
       scores: audit.scores,
       seoAnalysis: audit.seoAnalysis,
       performanceAnalysis: audit.performanceAnalysis,

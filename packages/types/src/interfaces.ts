@@ -2,11 +2,15 @@ import type { AuditStatus, AuditStage, ScoreCategory, Priority, RecommendationTy
 
 export interface Company {
   id: string;
+  _id: string;
   name: string;
   website: string;
+  domain?: string;
   industry?: string;
   description?: string;
   logoUrl?: string;
+  competitorUrl?: string;
+  isLocalBusiness?: boolean;
   socialAccounts?: SocialAccount[];
   technologyStack?: string[];
   organizationId: string;
@@ -22,29 +26,48 @@ export interface SocialAccount {
 
 export interface Audit {
   id: string;
+  _id: string;
   companyId: string;
   organizationId: string;
-  status: AuditStatus;
-  currentStage?: AuditStage;
+  status: AuditStatus | string;
+  currentStage?: AuditStage | string;
+  auditOptions?: AuditOptions;
   startedAt: Date;
   completedAt?: Date;
   crawlData?: CrawlData;
   seoAnalysis?: SEOAnalysis;
   performanceAnalysis?: PerformanceAnalysis;
   brandingAnalysis?: BrandingAnalysis;
+  accessibilityAnalysis?: AccessibilityAnalysis;
+  securityAnalysis?: SecurityAnalysis;
+  technologyDetection?: TechnologyDetection;
+  companyDiscovery?: Record<string, unknown>;
+  brandVision?: Record<string, unknown>;
+  socialSnapshot?: Record<string, unknown>;
+  competitorSnapshot?: Record<string, unknown>;
   scores?: ScoreSet;
   recommendations?: Recommendation[];
+  executiveSummary?: string;
+  proposal?: Record<string, unknown>;
   reportUrl?: string;
   error?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
+export interface AuditOptions {
+  crawlDepth?: number;
+  runSeoAudit?: boolean;
+  runPerformanceAudit?: boolean;
+  runBrandingAudit?: boolean;
+  runAiProcessing?: boolean;
+}
+
 export interface CrawlData {
   pages: CrawledPage[];
   totalPages: number;
   crawlDurationMs: number;
-  blockedPages?: string[];
+  blockedPages: string[];
 }
 
 export interface CrawledPage {
@@ -56,8 +79,8 @@ export interface CrawledPage {
   statusCode: number;
   loadTimeMs?: number;
   screenshots?: string[];
-  links?: { internal: string[]; external: string[] };
-  metadata?: PageMetadata;
+  links: { internal: string[]; external: string[] };
+  metadata: PageMetadata;
 }
 
 export interface PageMetadata {
@@ -69,7 +92,12 @@ export interface PageMetadata {
   twitterTags?: Record<string, string>;
   structuredData?: unknown[];
   robotsTxt?: string;
+  robotsMeta?: string;
   sitemapUrl?: string;
+  h1Count: number;
+  h2Count: number;
+  imageCount: number;
+  wordCount: number;
 }
 
 export interface SEOAnalysis {
@@ -114,9 +142,46 @@ export interface BrandingAnalysis {
   fontsDetected: string[];
   logoPresent: boolean;
   hasFavicon: boolean;
+  brandScore: number;
   imageCount: number;
   totalImages: number;
   issues: string[];
+  details: Record<string, unknown>;
+}
+
+export interface AccessibilityAnalysis {
+  score: number;
+  hasAltTextOnImages: boolean;
+  hasLangAttribute: boolean;
+  hasAriaLabels: boolean;
+  hasSkipLink: boolean;
+  headingStructureValid: boolean;
+  contrastRatioIssues: number;
+  issues: string[];
+  details: Record<string, unknown>;
+}
+
+export interface SecurityAnalysis {
+  score: number;
+  hasSsl: boolean;
+  hasHsts: boolean;
+  hasXssProtection: boolean;
+  hasContentTypeOptions: boolean;
+  hasFrameOptions: boolean;
+  hasCsp: boolean;
+  issues: string[];
+  details: Record<string, unknown>;
+}
+
+export interface TechnologyDetection {
+  cms?: string;
+  frameworks: string[];
+  analytics: string[];
+  hosting?: string;
+  sslProvider?: string;
+  javascriptLibraries: string[];
+  cssFrameworks: string[];
+  detected: boolean;
   details: Record<string, unknown>;
 }
 
@@ -127,7 +192,7 @@ export interface ScoreSet {
 
 export interface Recommendation {
   id: string;
-  type: RecommendationType;
+  type: RecommendationType | string;
   title: string;
   problem: string;
   evidence: string;
@@ -158,6 +223,7 @@ export interface AIResponse {
 
 export interface Lead {
   id: string;
+  _id: string;
   companyId: string;
   organizationId: string;
   status: LeadStatus;

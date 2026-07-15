@@ -109,8 +109,10 @@ export const AGENCY_SERVICES = [
 export const CRAWL_DEFAULTS = {
   MAX_PAGES: 10,
   TIMEOUT_MS: 30000,
-  WAIT_UNTIL: 'networkidle' as const,
+  WAIT_UNTIL: 'domcontentloaded' as const,
   USER_AGENT: 'ABAP-Audit-Bot/1.0',
+  CONCURRENCY: 1,
+  RATE_LIMIT_MS: 100,
 };
 
 export const AUDIT_TIMEOUT_MS = 300000;

@@ -481,13 +481,13 @@ docker compose up -d   # api :3000, web :3001, mongo, redis
   to `mongodb://172.18.0.5:27017/abap`.
 - `abap-redis` (IP `172.18.0.2`).
 - Running containers: `vps-api` (:3000), `vps-web` (:3001), `vps-mongo`, `abap-redis`.
-- Public: API `http://72.60.34.190:3000/api/v1`, Web `http://72.60.34.190:3001`.
+- Public: API `http://localhost:3000/api/v1`, Web `http://localhost:3001`.
 
 **Rebuild + restart (after a change):**
 ```bash
 docker build -f apps/api/Dockerfile -t abap-api .
 docker build -f apps/web/Dockerfile -t abap-web \
-  --build-arg NEXT_PUBLIC_API_URL=http://72.60.34.190:3000/api/v1 .
+  --build-arg NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1 .
 docker rm -f vps-api vps-web
 # re-run with the env block from §12
 ```

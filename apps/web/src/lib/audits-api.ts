@@ -61,6 +61,40 @@ export interface BrandingAnalysis {
   issues: string[];
 }
 
+export interface AccessibilityAnalysis {
+  altTextScore: number;
+  langScore: number;
+  ariaScore: number;
+  skipLinkScore: number;
+  headingStructureScore: number;
+  contrastScore: number;
+  overallScore: number;
+  issues: string[];
+}
+
+export interface SecurityAnalysis {
+  sslScore: number;
+  hstsScore: number;
+  xssProtectionScore: number;
+  contentTypeOptionsScore: number;
+  frameOptionsScore: number;
+  cspScore: number;
+  overallScore: number;
+  issues: string[];
+}
+
+export interface TechnologyDetection {
+  cms?: string;
+  cmsVersion?: string;
+  frameworks: string[];
+  analytics: string[];
+  libraries: string[];
+  cssFrameworks: string[];
+  hosting?: string;
+  cdn?: string;
+  detected: string[];
+}
+
 export interface Audit {
   _id: string;
   companyId: string;
@@ -91,6 +125,9 @@ export interface Audit {
   seoAnalysis?: SeoAnalysis;
   performanceAnalysis?: PerformanceAnalysis;
   brandingAnalysis?: BrandingAnalysis;
+  accessibilityAnalysis?: AccessibilityAnalysis;
+  securityAnalysis?: SecurityAnalysis;
+  technologyDetection?: TechnologyDetection;
   companyDiscovery?: {
     domain?: string;
     ip?: string;

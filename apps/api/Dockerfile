@@ -17,6 +17,7 @@ COPY packages/config/package.json ./packages/config/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/prompts/package.json ./packages/prompts/
 COPY packages/audit-core/package.json ./packages/audit-core/
+COPY packages/rules/package.json ./packages/rules/
 
 # Install with shamefully-hoist for flat node_modules (npm-like layout)
 RUN pnpm install --frozen-lockfile --shamefully-hoist
@@ -33,7 +34,7 @@ ENV CI=true
 # but produces ESM with extensionless relative imports that break when the
 # CommonJS API require()s them at runtime under native Node. Overriding to
 # CommonJS here only affects the Docker build, not local dev.
-RUN for p in types schemas constants prompts audit-core; do \
+RUN for p in types schemas constants prompts audit-core rules; do \
       node -e " \
         const fs=require('fs'); \
         const f='packages/'+process.argv[1]+'/tsconfig.json'; \
@@ -84,6 +85,7 @@ COPY packages/schemas/package.json ./packages/schemas/
 COPY packages/constants/package.json ./packages/constants/
 COPY packages/prompts/package.json ./packages/prompts/
 COPY packages/audit-core/package.json ./packages/audit-core/
+COPY packages/rules/package.json ./packages/rules/
 
 RUN pnpm install --frozen-lockfile --shamefully-hoist --prod
 
@@ -93,12 +95,13 @@ COPY --from=builder /app/packages/schemas/dist ./packages/schemas/dist
 COPY --from=builder /app/packages/constants/dist ./packages/constants/dist
 COPY --from=builder /app/packages/prompts/dist ./packages/prompts/dist
 COPY --from=builder /app/packages/audit-core/dist ./packages/audit-core/dist
+COPY --from=builder /app/packages/rules/dist ./packages/rules/dist
 
 # Repoint workspace package entry points at compiled dist output.
 # The source package.json files set "main"/"exports" to ./src/index.ts for dev
 # tooling, but in the production image only the compiled dist/ exists, so Node
 # must resolve to dist instead of missing .ts sources.
-RUN for p in types schemas constants prompts audit-core; do \
+RUN for p in types schemas constants prompts audit-core rules; do \
       node -e " \
         const fs=require('fs'); \
         const f='packages/'+process.argv[1]+'/package.json'; \
