@@ -11,6 +11,7 @@ import { SeoModule } from './modules/seo/seo.module';
 import { AiModule } from './modules/ai/ai.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { LeadsModule } from './modules/leads/leads.module';
+import { CompetitorModule } from './modules/competitor/competitor.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { LeadsModule } from './modules/leads/leads.module';
     AuditsModule,
     AuthModule,
     LeadsModule,
+    CompetitorModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

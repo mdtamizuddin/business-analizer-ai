@@ -8,6 +8,7 @@ export interface BrandingAnalysisResult {
   hasFavicon: boolean;
   imageCount: number;
   totalImages: number;
+  brandScore: number;
   issues: string[];
   details: Record<string, unknown>;
 }
@@ -46,6 +47,7 @@ export class BrandingService {
         hasFavicon: false,
         imageCount: 0,
         totalImages: 0,
+        brandScore: 0,
         issues,
         details,
       };
@@ -97,6 +99,13 @@ export class BrandingService {
     if (fontsDetected.length === 0) issues.push('Only system fonts detected — consider a custom brand typeface.');
     if (imageCount === 0) issues.push('No images on homepage — visual branding is weak.');
 
+    // Branding health score (0-100) from detected signals.
+    let brandScore = 0;
+    brandScore += logoPresent ? 25 : 0;
+    brandScore += hasFavicon ? 15 : 0;
+    brandScore += Math.min(colorsDetected.length, 4) * 12; // up to 48
+    brandScore += fontsDetected.length > 0 ? 12 : 0;
+
     this.logger.log(`Branding analysis complete for ${homepage.url}: ${colorsDetected.length} colors, ${fontsDetected.length} fonts`);
 
     return {
@@ -106,6 +115,7 @@ export class BrandingService {
       hasFavicon,
       imageCount,
       totalImages,
+      brandScore,
       issues,
       details,
     };
