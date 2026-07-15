@@ -99,8 +99,8 @@ export default function LeadsPage() {
     <div className="p-8 max-w-6xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Leads</h1>
-          <p className="text-sm text-slate-500">Track audited companies through your sales pipeline</p>
+          <h1 className="text-2xl font-bold text-text-primary">Leads</h1>
+          <p className="text-sm text-slate-400">Track audited companies through your sales pipeline</p>
         </div>
         <Button size="sm" onClick={() => setShowForm((s) => !s)}>
           <PlusCircle className="mr-1 h-4 w-4" /> New Lead
@@ -111,18 +111,18 @@ export default function LeadsPage() {
         <Card className="mb-6">
           <CardContent className="flex flex-wrap items-end gap-3 p-4">
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500">Company / Name</label>
+              <label className="text-xs text-slate-400">Company / Name</label>
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-border px-3 py-2 text-sm"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Acme Corp"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500">Email (optional)</label>
+              <label className="text-xs text-slate-400">Email (optional)</label>
               <input
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-border px-3 py-2 text-sm"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="contact@acme.com"
@@ -139,12 +139,12 @@ export default function LeadsPage() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <p className="font-semibold text-slate-900">{lead.name}</p>
+                  <p className="font-semibold text-text-primary">{lead.name}</p>
                   <p className="text-xs text-slate-400 capitalize">{lead.source} lead</p>
                 </div>
                 <Badge className={STATUS_COLORS[lead.status]}>{STATUS_LABELS[lead.status]}</Badge>
               </div>
-              <div className="flex flex-col gap-1 text-xs text-slate-500">
+              <div className="flex flex-col gap-1 text-xs text-slate-400">
                 {lead.email && <span className="flex items-center gap-1"><Mail className="h-3 w-3" />{lead.email}</span>}
                 {lead.estimatedValue && <span>Est. value: ${lead.estimatedValue.toLocaleString()}</span>}
                 {lead.notes.length > 0 && <span className="flex items-center gap-1"><StickyNote className="h-3 w-3" />{lead.notes.length} note(s)</span>}
@@ -184,10 +184,10 @@ export default function LeadsPage() {
                 {openLead.auditId && <span className="text-brand-600">From audit: {openLead.auditId}</span>}
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-700 mb-2">Notes</p>
+                <p className="text-sm font-medium text-slate-200 mb-2">Notes</p>
                 <div className="space-y-2">
                   {openLead.notes.map((n, i) => (
-                    <div key={i} className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                    <div key={i} className="rounded-lg bg-surface-hover px-3 py-2 text-sm text-slate-300">
                       {n.note}
                       <span className="block text-xs text-slate-400 mt-1">{new Date(n.createdAt).toLocaleString()}</span>
                     </div>
@@ -196,7 +196,7 @@ export default function LeadsPage() {
                 </div>
                 <div className="mt-2 flex gap-2">
                   <input
-                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="flex-1 rounded-lg border border-border px-3 py-2 text-sm"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Add a note..."

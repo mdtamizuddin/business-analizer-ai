@@ -49,8 +49,8 @@ export default function CompaniesPage() {
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Companies</h1>
-          <p className="text-sm text-slate-500 mt-1">{companies.length} companies</p>
+          <h1 className="text-2xl font-bold text-text-primary">Companies</h1>
+          <p className="text-sm text-slate-400 mt-1">{companies.length} companies</p>
         </div>
         <Link href="/audits/new">
           <Button>
@@ -85,7 +85,7 @@ export default function CompaniesPage() {
                     </Badge>
                   )}
                 </div>
-                <h3 className="font-semibold text-slate-900">{company.name}</h3>
+                <h3 className="font-semibold text-text-primary">{company.name}</h3>
                 <a
                   href={company.website}
                   target="_blank"
@@ -96,7 +96,7 @@ export default function CompaniesPage() {
                   <ExternalLink className="h-3 w-3" />
                 </a>
                 {company.industry && (
-                  <p className="mt-2 text-xs text-slate-500">{company.industry}</p>
+                  <p className="mt-2 text-xs text-slate-400">{company.industry}</p>
                 )}
                 <div className="mt-4 flex gap-2">
                   <Link href={`/audits/new`}>

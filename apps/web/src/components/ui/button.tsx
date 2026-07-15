@@ -2,11 +2,14 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 const variants = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-500',
-  secondary: 'border border-brand-600 text-brand-600 hover:bg-brand-50 focus-visible:ring-brand-500',
-  destructive: 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500',
-  ghost: 'text-slate-700 hover:bg-slate-100 focus-visible:ring-slate-400',
-  outline: 'border border-slate-300 text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-400',
+  primary: 'bg-primary text-white hover:bg-primary-600 shadow-glow-primary focus-visible:ring-primary/40',
+  ai: 'bg-ai-hero text-white hover:opacity-90 shadow-glow-secondary focus-visible:ring-secondary/40',
+  secondary:
+    'border border-primary/40 text-primary hover:bg-primary/10 focus-visible:ring-primary/40',
+  success: 'bg-success text-white hover:bg-success/90 shadow-glow-success focus-visible:ring-success/40',
+  destructive: 'bg-danger text-white hover:bg-danger/90 focus-visible:ring-danger/40',
+  ghost: 'text-text-secondary hover:bg-surface-hover focus-visible:ring-surface-hover',
+  outline: 'border border-border text-text-primary hover:bg-surface-hover focus-visible:ring-surface-hover',
 };
 
 const sizes = {
@@ -25,7 +28,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50 disabled:pointer-events-none',
         variants[variant],
         sizes[size],
         className,

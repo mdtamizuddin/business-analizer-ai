@@ -37,14 +37,14 @@ export default function SocialPage() {
   return (
     <div className="p-8 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Social Media Intelligence</h1>
-        <p className="text-sm text-slate-500">Check social presence across LinkedIn, Facebook, Instagram, TikTok</p>
+        <h1 className="text-2xl font-bold text-text-primary">Social Media Intelligence</h1>
+        <p className="text-sm text-slate-400">Check social presence across LinkedIn, Facebook, Instagram, TikTok</p>
       </div>
 
       <Card className="mb-6">
         <CardContent className="flex gap-3 p-4">
           <input
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="flex-1 rounded-lg border border-border px-3 py-2 text-sm"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="company.com"
@@ -79,11 +79,11 @@ export default function SocialPage() {
             <CardHeader><CardTitle>Profiles</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {result.profiles.map((p, i) => (
-                <div key={i} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
-                  <span className="text-sm font-medium text-slate-700">{p.platform}</span>
+                <div key={i} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                  <span className="text-sm font-medium text-slate-200">{p.platform}</span>
                   <span className="flex items-center gap-2 text-xs">
                     {p.found ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
-                    {p.followerText && <span className="text-slate-500">{p.followerText}</span>}
+                    {p.followerText && <span className="text-slate-400">{p.followerText}</span>}
                   </span>
                 </div>
               ))}
@@ -92,7 +92,7 @@ export default function SocialPage() {
 
           <Card>
             <CardHeader><CardTitle>AI Summary</CardTitle></CardHeader>
-            <CardContent><p className="text-sm text-slate-600">{result.summary}</p></CardContent>
+            <CardContent><p className="text-sm text-slate-300">{result.summary}</p></CardContent>
           </Card>
         </div>
       )}

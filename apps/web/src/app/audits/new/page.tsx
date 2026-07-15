@@ -100,12 +100,12 @@ export default function NewAuditPage() {
 
   return (
     <div className="p-8 max-w-2xl">
-      <Link href="/dashboard" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
+      <Link href="/dashboard" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200">
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
       </Link>
 
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">New Audit</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">New Audit</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
@@ -121,7 +121,7 @@ export default function NewAuditPage() {
                 className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                   mode === 'existing'
                     ? 'border-brand-500 bg-brand-50 text-brand-700'
-                    : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                    : 'border-border text-slate-300 hover:bg-surface-hover'
                 }`}
               >
                 Existing Company
@@ -132,7 +132,7 @@ export default function NewAuditPage() {
                 className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                   mode === 'new'
                     ? 'border-brand-500 bg-brand-50 text-brand-700'
-                    : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                    : 'border-border text-slate-300 hover:bg-surface-hover'
                 }`}
               >
                 New Company
@@ -141,7 +141,7 @@ export default function NewAuditPage() {
 
             {mode === 'existing' ? (
               companies.length === 0 ? (
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-400">
                   No companies yet. Switch to &quot;New Company&quot; to add one.
                 </p>
               ) : (
@@ -151,7 +151,7 @@ export default function NewAuditPage() {
                     id="company"
                     value={selectedCompanyId}
                     onChange={(e) => setSelectedCompanyId(e.target.value)}
-                    className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="flex h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   >
                     {companies.map((c) => (
                       <option key={c._id} value={c._id}>
@@ -228,18 +228,18 @@ export default function NewAuditPage() {
                   type="checkbox"
                   checked={options.runSeoAudit}
                   onChange={(e) => setOptions({ ...options, runSeoAudit: e.target.checked })}
-                  className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                  className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500"
                 />
-                <span className="text-sm text-slate-700">SEO Analysis</span>
+                <span className="text-sm text-slate-200">SEO Analysis</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={options.runAiProcessing}
                   onChange={(e) => setOptions({ ...options, runAiProcessing: e.target.checked })}
-                  className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                  className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500"
                 />
-                <span className="text-sm text-slate-700">AI Recommendations</span>
+                <span className="text-sm text-slate-200">AI Recommendations</span>
               </label>
             </div>
           </CardContent>

@@ -30,14 +30,14 @@ export default function CompetitorPage() {
   return (
     <div className="p-8 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Competitor Intelligence</h1>
-        <p className="text-sm text-slate-500">Crawl a competitor and compare against your audit</p>
+        <h1 className="text-2xl font-bold text-text-primary">Competitor Intelligence</h1>
+        <p className="text-sm text-slate-400">Crawl a competitor and compare against your audit</p>
       </div>
 
       <Card className="mb-6">
         <CardContent className="flex gap-3 p-4">
           <input
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="flex-1 rounded-lg border border-border px-3 py-2 text-sm"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://competitor.com"
@@ -86,19 +86,19 @@ export default function CompetitorPage() {
             <Card className="border-green-200">
               <CardHeader><CardTitle className="flex items-center gap-2 text-green-700"><TrendingUp className="h-4 w-4" />Strengths</CardTitle></CardHeader>
               <CardContent className="space-y-2">
-                {result.gap.strengths.map((s, i) => <p key={i} className="text-sm text-slate-600">• {s}</p>)}
+                {result.gap.strengths.map((s, i) => <p key={i} className="text-sm text-slate-300">• {s}</p>)}
               </CardContent>
             </Card>
             <Card className="border-red-200">
               <CardHeader><CardTitle className="flex items-center gap-2 text-red-700"><TrendingDown className="h-4 w-4" />Weaknesses</CardTitle></CardHeader>
               <CardContent className="space-y-2">
-                {result.gap.weaknesses.map((w, i) => <p key={i} className="text-sm text-slate-600">• {w}</p>)}
+                {result.gap.weaknesses.map((w, i) => <p key={i} className="text-sm text-slate-300">• {w}</p>)}
               </CardContent>
             </Card>
             <Card className="border-amber-200">
               <CardHeader><CardTitle className="flex items-center gap-2 text-amber-700"><Target className="h-4 w-4" />Opportunities</CardTitle></CardHeader>
               <CardContent className="space-y-2">
-                {result.gap.opportunities.map((o, i) => <p key={i} className="text-sm text-slate-600">• {o}</p>)}
+                {result.gap.opportunities.map((o, i) => <p key={i} className="text-sm text-slate-300">• {o}</p>)}
               </CardContent>
             </Card>
           </div>

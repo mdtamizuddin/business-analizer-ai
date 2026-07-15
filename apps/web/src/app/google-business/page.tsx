@@ -36,14 +36,14 @@ export default function GoogleBusinessPage() {
   return (
     <div className="p-8 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Google Business Intelligence</h1>
-        <p className="text-sm text-slate-500">Analyze ratings, reviews sentiment, and local SEO</p>
+        <h1 className="text-2xl font-bold text-text-primary">Google Business Intelligence</h1>
+        <p className="text-sm text-slate-400">Analyze ratings, reviews sentiment, and local SEO</p>
       </div>
 
       <Card className="mb-6">
         <CardContent className="flex gap-3 p-4">
           <input
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="flex-1 rounded-lg border border-border px-3 py-2 text-sm"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://maps.google.com/?cid=..."
@@ -79,7 +79,7 @@ export default function GoogleBusinessPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-slate-600">{result.summary}</p>
+              <p className="text-sm text-slate-300">{result.summary}</p>
             </CardContent>
           </Card>
 
@@ -87,14 +87,14 @@ export default function GoogleBusinessPage() {
             <Card className="border-red-200">
               <CardHeader><CardTitle className="flex items-center gap-2 text-red-700"><ThumbsDown className="h-4 w-4" />Top Complaints</CardTitle></CardHeader>
               <CardContent className="space-y-1">
-                {result.topComplaints.length ? result.topComplaints.map((c, i) => <p key={i} className="text-sm text-slate-600">• {c}</p>)
+                {result.topComplaints.length ? result.topComplaints.map((c, i) => <p key={i} className="text-sm text-slate-300">• {c}</p>)
                   : <p className="text-xs text-slate-400">None detected.</p>}
               </CardContent>
             </Card>
             <Card className="border-green-200">
               <CardHeader><CardTitle className="flex items-center gap-2 text-green-700"><ThumbsUp className="h-4 w-4" />Top Praises</CardTitle></CardHeader>
               <CardContent className="space-y-1">
-                {result.topPraises.length ? result.topPraises.map((c, i) => <p key={i} className="text-sm text-slate-600">• {c}</p>)
+                {result.topPraises.length ? result.topPraises.map((c, i) => <p key={i} className="text-sm text-slate-300">• {c}</p>)
                   : <p className="text-xs text-slate-400">None detected.</p>}
               </CardContent>
             </Card>

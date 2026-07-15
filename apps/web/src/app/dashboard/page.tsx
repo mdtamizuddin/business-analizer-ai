@@ -54,7 +54,7 @@ export default function DashboardPage() {
         <Card className="max-w-md">
           <CardContent className="flex flex-col items-center gap-3 p-8">
             <AlertCircle className="h-8 w-8 text-red-500" />
-            <p className="text-sm text-slate-600">{error}</p>
+            <p className="text-sm text-slate-300">{error}</p>
             <Button onClick={fetchData} size="sm">Retry</Button>
           </CardContent>
         </Card>
@@ -69,8 +69,8 @@ export default function DashboardPage() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
+          <p className="text-sm text-slate-400 mt-1">
             {audits.length} total audits · {activeAudits.length} in progress · {completedAudits.length} completed
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function DashboardPage() {
 
       {activeAudits.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700 uppercase tracking-wide">In Progress</h2>
+          <h2 className="mb-3 text-sm font-semibold text-slate-200 uppercase tracking-wide">In Progress</h2>
           <div className="space-y-2">
             {activeAudits.map((audit) => {
               const company = companyMap.get(audit.companyId);
@@ -95,10 +95,10 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-4">
                         <StatusBadge status={audit.status} />
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-text-primary">
                             {company?.name ?? 'Unknown Company'}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-slate-400">
                             {company?.website} · Started {new Date(audit.startedAt).toLocaleTimeString()}
                           </p>
                         </div>
@@ -114,7 +114,7 @@ export default function DashboardPage() {
       )}
 
       <div>
-        <h2 className="mb-3 text-sm font-semibold text-slate-700 uppercase tracking-wide">All Audits</h2>
+        <h2 className="mb-3 text-sm font-semibold text-slate-200 uppercase tracking-wide">All Audits</h2>
         {audits.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
@@ -144,10 +144,10 @@ export default function DashboardPage() {
                           </div>
                         )}
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-text-primary">
                             {company?.name ?? 'Unknown Company'}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-slate-400">
                             {company?.website} · {new Date(audit.createdAt).toLocaleDateString()}
                           </p>
                           {audit.recommendations.length > 0 && (

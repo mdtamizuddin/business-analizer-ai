@@ -23,7 +23,7 @@ export function ScoreCircle({ score, size = 'md' }: { score: number; size?: 'sm'
   return (
     <div className={cn('relative inline-flex items-center justify-center', dimensions[size])}>
       <svg className="absolute inset-0 -rotate-90" viewBox="0 0 64 64">
-        <circle cx="32" cy="32" r={radius} fill="none" stroke="#e2e8f0" strokeWidth={stroke[size]} />
+        <circle cx="32" cy="32" r={radius} fill="none" stroke="#263247" strokeWidth={stroke[size]} />
         <circle
           cx="32"
           cy="32"
@@ -38,7 +38,7 @@ export function ScoreCircle({ score, size = 'md' }: { score: number; size?: 'sm'
         />
       </svg>
       <div className="flex flex-col items-center">
-        <span className="font-bold text-slate-900">{score}</span>
+        <span className="font-bold text-text-primary">{score}</span>
         <span className="text-xs font-medium" style={{ color }}>
           {grade}
         </span>

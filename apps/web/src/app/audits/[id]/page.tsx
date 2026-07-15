@@ -17,9 +17,10 @@ import { STAGE_LABELS, SCORE_CATEGORY_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 function scoreColor(score: number): string {
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#eab308';
-  return '#ef4444';
+  if (score >= 90) return '#22c55e'; // excellent
+  if (score >= 70) return '#4F8CFF'; // good
+  if (score >= 40) return '#F59E0B'; // needs improvement
+  return '#EF4444'; // critical
 }
 
 const STAGES = [
@@ -77,7 +78,7 @@ export default function AuditDetailPage() {
         <Card className="max-w-md">
           <CardContent className="flex flex-col items-center gap-3 p-8">
             <AlertCircle className="h-8 w-8 text-red-500" />
-            <p className="text-sm text-slate-600">{error ?? 'Audit not found'}</p>
+            <p className="text-sm text-slate-300">{error ?? 'Audit not found'}</p>
             <Link href="/dashboard">
               <Button size="sm">Back to Dashboard</Button>
             </Link>
@@ -92,7 +93,7 @@ export default function AuditDetailPage() {
 
   return (
     <div className="p-8 max-w-5xl">
-      <Link href="/dashboard" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
+      <Link href="/dashboard" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200">
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
       </Link>
@@ -101,7 +102,7 @@ export default function AuditDetailPage() {
       <div className="mb-6 flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">{company?.name ?? 'Audit'}</h1>
+            <h1 className="text-2xl font-bold text-text-primary">{company?.name ?? 'Audit'}</h1>
             <StatusBadge status={audit.status} />
           </div>
           {company?.website && (
@@ -128,7 +129,7 @@ export default function AuditDetailPage() {
             href={`${API_BASE}/audits/${audit._id}/report?format=pdf`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm font-medium text-slate-200 hover:bg-surface-hover"
           >
             <FileDown className="h-4 w-4" /> PDF
           </a>
@@ -136,7 +137,7 @@ export default function AuditDetailPage() {
             href={`${API_BASE}/audits/${audit._id}/report?format=html`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm font-medium text-slate-200 hover:bg-surface-hover"
           >
             <FileText className="h-4 w-4" /> HTML
           </a>
@@ -168,20 +169,20 @@ export default function AuditDetailPage() {
                 const isDone = idx < currentStageIndex || audit.status === 'completed';
                 return (
                   <div key={stage} className="flex items-center">
-                    {idx > 0 && <div className={cn('h-0.5 w-8', isDone ? 'bg-brand-500' : 'bg-slate-200')} />}
+                    {idx > 0 && <div className={cn('h-0.5 w-8', isDone ? 'bg-brand-500' : 'bg-surface-hover')} />}
                     <div
                       className={cn(
                         'flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium',
                         isActive && 'bg-brand-600 text-white animate-pulse',
                         isDone && 'bg-brand-100 text-brand-700',
-                        !isActive && !isDone && 'bg-slate-100 text-slate-400',
+                        !isActive && !isDone && 'bg-surface-hover text-slate-400',
                       )}
                     >
                       {isDone ? '✓' : idx + 1}
                     </div>
                     <span className={cn(
                       'ml-2 text-xs',
-                      isActive ? 'font-medium text-brand-700' : isDone ? 'text-slate-600' : 'text-slate-400',
+                      isActive ? 'font-medium text-brand-700' : isDone ? 'text-slate-300' : 'text-slate-400',
                     )}>
                       {STAGE_LABELS[stage] ?? stage}
                     </span>
@@ -189,7 +190,7 @@ export default function AuditDetailPage() {
                 );
               })}
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+            <div className="mt-4 flex items-center gap-2 text-sm text-slate-400">
               <Clock className="h-4 w-4" />
               Elapsed: {Math.round((Date.now() - new Date(audit.startedAt).getTime()) / 1000)}s
             </div>
@@ -209,7 +210,7 @@ export default function AuditDetailPage() {
               {Object.entries(audit.scores.categories).map(([key, score]) => (
                 <div key={key} className="flex flex-col items-center gap-1">
                   <ScoreCircle score={score} size="sm" />
-                  <span className="text-xs text-slate-500 text-center">
+                  <span className="text-xs text-slate-400 text-center">
                     {SCORE_CATEGORY_LABELS[key] ?? key}
                   </span>
                 </div>
@@ -218,9 +219,13 @@ export default function AuditDetailPage() {
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={Object.entries(audit.scores.categories).map(([key, score]) => ({ name: SCORE_CATEGORY_LABELS[key] ?? key, score }))}>
-                  <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-                  <Tooltip />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94A3B8' }} interval={0} angle={-20} textAnchor="end" height={60} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#94A3B8' }} />
+                  <Tooltip
+                    contentStyle={{ background: '#111827', border: '1px solid #263247', borderRadius: 8, color: '#fff' }}
+                    labelStyle={{ color: '#94A3B8' }}
+                    itemStyle={{ color: '#fff' }}
+                  />
                   <Bar dataKey="score" radius={[4, 4, 0, 0]}>
                     {Object.entries(audit.scores.categories).map(([, score]) => (
                       <Cell key={score} fill={scoreColor(score)} />
@@ -243,30 +248,30 @@ export default function AuditDetailPage() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-slate-900">{audit.crawlData.totalPages}</p>
-                <p className="text-xs text-slate-500">Pages Crawled</p>
+                <p className="text-2xl font-bold text-text-primary">{audit.crawlData.totalPages}</p>
+                <p className="text-xs text-slate-400">Pages Crawled</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-text-primary">
                   {(audit.crawlData.crawlDurationMs / 1000).toFixed(1)}s
                 </p>
-                <p className="text-xs text-slate-500">Crawl Duration</p>
+                <p className="text-xs text-slate-400">Crawl Duration</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-text-primary">
                   {audit.crawlData.pages.reduce((sum, p) => sum + (p.metadata.wordCount ?? 0), 0).toLocaleString()}
                 </p>
-                <p className="text-xs text-slate-500">Words Analyzed</p>
+                <p className="text-xs text-slate-400">Words Analyzed</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-2xl font-bold text-text-primary">
                   {audit.crawlData.pages.reduce((sum, p) => sum + (p.links.internal.length), 0)}
                 </p>
-                <p className="text-xs text-slate-500">Internal Links</p>
+                <p className="text-xs text-slate-400">Internal Links</p>
               </div>
             </div>
             {audit.crawlData.blockedPages.length > 0 && (
-              <div className="mt-4 rounded-lg bg-yellow-50 border border-yellow-200 px-3 py-2 text-xs text-yellow-700">
+              <div className="mt-4 rounded-lg bg-warning/10 border border-warning/30 px-3 py-2 text-xs text-warning">
                 {audit.crawlData.blockedPages.length} page(s) blocked or failed during crawl
               </div>
             )}
@@ -296,8 +301,8 @@ export default function AuditDetailPage() {
                 ['External Links', audit.seoAnalysis.externalLinksScore],
                 ['Performance SEO', audit.seoAnalysis.performanceSeoScore],
               ].map(([label, score]) => (
-                <div key={label as string} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
-                  <span className="text-xs text-slate-600">{label}</span>
+                <div key={label as string} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                  <span className="text-xs text-slate-300">{label}</span>
                   <span className={cn(
                     'text-sm font-bold',
                     (score as number) >= 80 ? 'text-green-600' : (score as number) >= 60 ? 'text-yellow-600' : 'text-red-600',
@@ -309,9 +314,9 @@ export default function AuditDetailPage() {
             </div>
             {audit.seoAnalysis.issues.length > 0 && (
               <div className="space-y-1">
-                <p className="text-sm font-medium text-slate-700 mb-2">Issues Found:</p>
+                <p className="text-sm font-medium text-slate-200 mb-2">Issues Found:</p>
                 {audit.seoAnalysis.issues.map((issue, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-300">
                     <span className="mt-0.5 text-red-400">•</span>
                     {issue}
                   </div>
@@ -330,7 +335,7 @@ export default function AuditDetailPage() {
             <CardDescription>AI-generated strategic overview</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none whitespace-pre-wrap text-sm text-slate-700">
+            <div className="prose prose-sm max-w-none whitespace-pre-wrap text-sm text-slate-200">
               {audit.executiveSummary}
             </div>
           </CardContent>
@@ -352,9 +357,9 @@ export default function AuditDetailPage() {
                 ['Accessibility', audit.performanceAnalysis.accessibilityScore],
                 ['Best Practices', audit.performanceAnalysis.bestPracticesScore],
               ].map(([label, score]) => (
-                <div key={label as string} className="flex flex-col items-center gap-1 rounded-lg border border-slate-200 px-3 py-3">
+                <div key={label as string} className="flex flex-col items-center gap-1 rounded-lg border border-border px-3 py-3">
                   <ScoreCircle score={score as number} size="sm" />
-                  <span className="text-xs text-slate-600">{label}</span>
+                  <span className="text-xs text-slate-300">{label}</span>
                 </div>
               ))}
             </div>
@@ -367,9 +372,9 @@ export default function AuditDetailPage() {
                 ['TBT', audit.performanceAnalysis.coreWebVitals.tbt, 'ms'],
                 ['SI', audit.performanceAnalysis.coreWebVitals.si, 'ms'],
               ].map(([label, value, unit]) => (
-                <div key={label as string} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
-                  <span className="text-xs text-slate-600">{label}</span>
-                  <span className="text-sm font-bold text-slate-900">
+                <div key={label as string} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                  <span className="text-xs text-slate-300">{label}</span>
+                  <span className="text-sm font-bold text-text-primary">
                     {value === undefined || value === null ? '—' : `${Math.round(value as number)}${unit}`}
                   </span>
                 </div>
@@ -377,9 +382,9 @@ export default function AuditDetailPage() {
             </div>
             {audit.performanceAnalysis.issues.length > 0 && (
               <div className="space-y-1">
-                <p className="text-sm font-medium text-slate-700 mb-2">Issues Found:</p>
+                <p className="text-sm font-medium text-slate-200 mb-2">Issues Found:</p>
                 {audit.performanceAnalysis.issues.map((issue, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-300">
                     <span className="mt-0.5 text-red-400">•</span>
                     {issue}
                   </div>
@@ -399,31 +404,31 @@ export default function AuditDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+              <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                 {audit.brandingAnalysis.logoPresent ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
-                <span className="text-xs text-slate-600">Logo</span>
+                <span className="text-xs text-slate-300">Logo</span>
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+              <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                 {audit.brandingAnalysis.hasFavicon ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
-                <span className="text-xs text-slate-600">Favicon</span>
+                <span className="text-xs text-slate-300">Favicon</span>
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+              <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                 <ImageIcon className="h-4 w-4 text-slate-400" />
-                <span className="text-xs text-slate-600">{audit.brandingAnalysis.imageCount} homepage imgs</span>
+                <span className="text-xs text-slate-300">{audit.brandingAnalysis.imageCount} homepage imgs</span>
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+              <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                 <Type className="h-4 w-4 text-slate-400" />
-                <span className="text-xs text-slate-600">{audit.brandingAnalysis.fontsDetected.length} brand fonts</span>
+                <span className="text-xs text-slate-300">{audit.brandingAnalysis.fontsDetected.length} brand fonts</span>
               </div>
             </div>
             {audit.brandingAnalysis.colorsDetected.length > 0 && (
               <div className="mb-4">
-                <p className="text-xs font-medium text-slate-600 mb-2">Detected Colors</p>
+                <p className="text-xs font-medium text-slate-300 mb-2">Detected Colors</p>
                 <div className="flex flex-wrap gap-2">
                   {audit.brandingAnalysis.colorsDetected.map((c) => (
-                    <div key={c} className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-2 py-1">
-                      <span className="h-4 w-4 rounded border border-slate-300" style={{ backgroundColor: c }} />
-                      <span className="text-xs text-slate-500">{c}</span>
+                    <div key={c} className="flex items-center gap-1.5 rounded-lg border border-border px-2 py-1">
+                      <span className="h-4 w-4 rounded border border-border" style={{ backgroundColor: c }} />
+                      <span className="text-xs text-slate-400">{c}</span>
                     </div>
                   ))}
                 </div>
@@ -431,9 +436,9 @@ export default function AuditDetailPage() {
             )}
             {audit.brandingAnalysis.issues.length > 0 && (
               <div className="space-y-1">
-                <p className="text-sm font-medium text-slate-700 mb-2">Issues Found:</p>
+                <p className="text-sm font-medium text-slate-200 mb-2">Issues Found:</p>
                 {audit.brandingAnalysis.issues.map((issue, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-300">
                     <span className="mt-0.5 text-red-400">•</span>
                     {issue}
                   </div>
@@ -447,7 +452,7 @@ export default function AuditDetailPage() {
       {/* Recommendations */}
       {audit.recommendations.length > 0 && (
         <div className="mb-6">
-          <h2 className="mb-3 text-lg font-semibold text-slate-900">
+          <h2 className="mb-3 text-lg font-semibold text-text-primary">
             Recommendations ({audit.recommendations.length})
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
