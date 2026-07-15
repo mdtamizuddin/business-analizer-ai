@@ -3,10 +3,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, AlertCircle, Loader2, ExternalLink, Clock, Type, Image as ImageIcon, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Loader2, ExternalLink, Clock, Type, Image as ImageIcon, CheckCircle2, XCircle, FileDown, FileText } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { auditsApi, type Audit } from '@/lib/audits-api';
 import { companiesApi, type Company } from '@/lib/companies-api';
+import { API_BASE } from '@/lib/api';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ScoreCircle } from '@/components/ui/score-circle';
 import { RecommendationCard } from '@/components/ui/recommendation-card';
@@ -121,7 +122,25 @@ export default function AuditDetailPage() {
             )}
           </p>
         </div>
-        {audit.scores && <ScoreCircle score={audit.scores.overall} size="lg" />}
+        <div className="flex items-center gap-3">
+          {audit.scores && <ScoreCircle score={audit.scores.overall} size="lg" />}
+          <a
+            href={`${API_BASE}/audits/${audit._id}/report?format=pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            <FileDown className="h-4 w-4" /> PDF
+          </a>
+          <a
+            href={`${API_BASE}/audits/${audit._id}/report?format=html`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            <FileText className="h-4 w-4" /> HTML
+          </a>
+        </div>
       </div>
 
       {/* Error display */}
