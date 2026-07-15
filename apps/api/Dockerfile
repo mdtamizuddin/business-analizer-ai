@@ -49,9 +49,31 @@ RUN for p in types schemas constants prompts audit-core; do \
 RUN pnpm exec turbo build --filter=@abap/api...
 
 # ---- Production stage ----
-FROM node:24-alpine AS runner
+# Debian slim (not alpine): Playwright's browser binaries + system deps install
+# reliably here (Alpine/musl is unsupported by Playwright's install-deps).
+FROM node:24-slim AS runner
 
 RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
+
+# System libraries required by Chromium / chrome-headless-shell
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      chromium \
+      libnss3 \
+      libatk1.0-0 \
+      libatk-bridge2.0-0 \
+      libcups2 \
+      libdrm2 \
+      libxkbcommon0 \
+      libxcomposite1 \
+      libxdamage1 \
+      libxfixes3 \
+      libxrandr2 \
+      libgbm1 \
+      libpango-1.0-0 \
+      libcairo2 \
+      libasound2 \
+      fonts-liberation \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -87,6 +109,15 @@ RUN for p in types schemas constants prompts audit-core; do \
         fs.writeFileSync(f, JSON.stringify(j,null,2)); \
       " "$p"; \
     done
+
+# Install the Chromium browser binary Playwright needs at runtime.
+# PLAYWRIGHT_BROWSERS_PATH=0 keeps it inside node_modules so it ships with the image.
+# CI=true prevents pnpm's interactive module-purge prompt during the install.
+# We invoke the Playwright CLI binary directly (not `pnpm exec`) because pnpm's
+# workspace exec resolution can't find the binary in this prod-only context.
+ENV PLAYWRIGHT_BROWSERS_PATH=0
+ENV CI=true
+RUN node node_modules/playwright/cli.js install chromium
 
 EXPOSE 3000
 
