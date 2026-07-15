@@ -24,10 +24,18 @@ function scoreColor(score: number): string {
 }
 
 const STAGES = [
+  'company_input',
   'company_discovery',
-  'website_crawl',
-  'seo_analysis',
+  'data_collection',
+  'website_analysis',
+  'brand_analysis',
+  'social_analysis',
+  'competitor_research',
   'ai_processing',
+  'business_scoring',
+  'recommendations',
+  'report_generation',
+  'sales_proposal',
 ];
 
 export default function AuditDetailPage() {
@@ -163,26 +171,26 @@ export default function AuditDetailPage() {
             <CardTitle className="text-base">Audit Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {STAGES.map((stage, idx) => {
                 const isActive = idx === currentStageIndex;
                 const isDone = idx < currentStageIndex || audit.status === 'completed';
                 return (
                   <div key={stage} className="flex items-center">
-                    {idx > 0 && <div className={cn('h-0.5 w-8', isDone ? 'bg-brand-500' : 'bg-surface-hover')} />}
+                    {idx > 0 && <div className={cn('h-0.5 w-6', isDone ? 'bg-primary' : 'bg-surface-hover')} />}
                     <div
                       className={cn(
-                        'flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium',
-                        isActive && 'bg-brand-600 text-white animate-pulse',
-                        isDone && 'bg-brand-100 text-brand-700',
-                        !isActive && !isDone && 'bg-surface-hover text-slate-400',
+                        'flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold',
+                        isActive && 'bg-primary text-white animate-pulse shadow-glow-primary',
+                        isDone && 'bg-primary/15 text-primary',
+                        !isActive && !isDone && 'bg-surface-hover text-text-secondary',
                       )}
                     >
                       {isDone ? '✓' : idx + 1}
                     </div>
                     <span className={cn(
-                      'ml-2 text-xs',
-                      isActive ? 'font-medium text-brand-700' : isDone ? 'text-slate-300' : 'text-slate-400',
+                      'ml-1.5 text-xs',
+                      isActive ? 'font-medium text-primary' : isDone ? 'text-slate-300' : 'text-text-secondary',
                     )}>
                       {STAGE_LABELS[stage] ?? stage}
                     </span>
@@ -327,9 +335,108 @@ export default function AuditDetailPage() {
         </Card>
       )}
 
+      {/* Company Discovery (Stage 2) */}
+      {audit.companyDiscovery && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Company Discovery</CardTitle>
+            <CardDescription>Reverse DNS, IP &amp; industry enrichment</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+              <div>
+                <p className="text-2xl font-bold text-text-primary">{audit.companyDiscovery.industry ?? '—'}</p>
+                <p className="text-xs text-text-secondary">Industry</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-text-primary">{audit.companyDiscovery.ip ?? '—'}</p>
+                <p className="text-xs text-text-secondary">IP Address</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-text-primary">{audit.companyDiscovery.hostname ?? '—'}</p>
+                <p className="text-xs text-text-secondary">Reverse DNS</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-text-primary">{audit.companyDiscovery.localBusiness ? 'Yes' : 'No'}</p>
+                <p className="text-xs text-text-secondary">Local Business</p>
+              </div>
+            </div>
+            {audit.companyDiscovery.notes?.length > 0 && (
+              <div className="space-y-1">
+                {audit.companyDiscovery.notes.map((n: string, i: number) => (
+                  <p key={i} className="text-xs text-slate-300">• {n}</p>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Brand Vision (Stage 5) */}
+      {audit.brandVision?.critique && (
+        <Card className="mb-6 border-secondary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="inline-block h-2 w-2 rounded-full bg-ai-premium" /> Brand Vision Analysis
+            </CardTitle>
+            <CardDescription>AI visual critique of the homepage</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-300 whitespace-pre-wrap">{audit.brandVision.critique}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Social Snapshot (Stage 6) */}
+      {audit.socialSnapshot && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Social Presence</CardTitle>
+            <CardDescription>Presence {audit.socialSnapshot.presenceScore} · Consistency {audit.socialSnapshot.consistencyScore}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-300 mb-3">{audit.socialSnapshot.summary}</p>
+            <div className="space-y-1">
+              {audit.socialSnapshot.profiles.map((p: any, i: number) => (
+                <div key={i} className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm">
+                  <span className="font-medium text-text-primary">{p.platform}</span>
+                  <span className={p.found ? 'text-success' : 'text-danger'}>{p.found ? (p.followerText ?? 'Found') : 'Not found'}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Competitor Snapshot (Stage 7) */}
+      {audit.competitorSnapshot && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Competitor Intelligence</CardTitle>
+            <CardDescription>{audit.competitorSnapshot.competitor.url} · score {audit.competitorSnapshot.competitor.overallScore}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs font-semibold text-success mb-1">Strengths</p>
+                {audit.competitorSnapshot.gap.strengths.map((s: string, i: number) => <p key={i} className="text-sm text-slate-300">• {s}</p>)}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-warning mb-1">Weaknesses</p>
+                {audit.competitorSnapshot.gap.weaknesses.map((w: string, i: number) => <p key={i} className="text-sm text-slate-300">• {w}</p>)}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-primary mb-1">Opportunities</p>
+                {audit.competitorSnapshot.gap.opportunities.map((o: string, i: number) => <p key={i} className="text-sm text-slate-300">• {o}</p>)}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Executive Summary */}
       {audit.executiveSummary && (
-        <Card className="mb-6 border-brand-200 bg-brand-50/40">
+        <Card className="mb-6 border-primary/30 bg-primary/5">
           <CardHeader>
             <CardTitle>Executive Summary</CardTitle>
             <CardDescription>AI-generated strategic overview</CardDescription>
@@ -445,6 +552,59 @@ export default function AuditDetailPage() {
                 ))}
               </div>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Sales Proposal (Stage 12) */}
+      {audit.proposal && (
+        <Card className="mb-6 border-ai-premium/40 bg-ai-premium/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="inline-block h-2 w-2 rounded-full bg-ai-premium" /> Sales Proposal
+            </CardTitle>
+            <CardDescription>{audit.proposal.headline}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-text-secondary">
+                    <th className="py-2 pr-4 font-medium">Service</th>
+                    <th className="py-2 pr-4 font-medium">Effort</th>
+                    <th className="py-2 pr-4 font-medium text-right">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {audit.proposal.lineItems.map((li: any, i: number) => (
+                    <tr key={i} className="border-b border-border/60">
+                      <td className="py-2 pr-4 text-text-primary">{li.service}</td>
+                      <td className="py-2 pr-4 text-text-secondary">{li.effort}</td>
+                      <td className="py-2 pr-4 text-right font-semibold text-text-primary">${li.price.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="text-sm">
+                <span className="text-text-secondary">Subtotal: </span>
+                <span className="font-bold text-text-primary">${audit.proposal.subtotal.toLocaleString()}</span>
+                <span className="text-text-secondary ml-4">Monthly retainer: </span>
+                <span className="font-bold text-primary">${audit.proposal.monthlyRetainer.toLocaleString()}</span>
+              </div>
+              <div className="rounded-lg bg-success/10 px-3 py-1 text-xs text-success">
+                {audit.proposal.estimatedRoi}
+              </div>
+            </div>
+            <a
+              href={`${API_BASE}/audits/${audit._id}/report?format=pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-1 rounded-lg bg-ai-premium px-3 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              <FileDown className="h-4 w-4" /> Export Proposal PDF
+            </a>
           </CardContent>
         </Card>
       )}

@@ -91,9 +91,41 @@ export interface Audit {
   seoAnalysis?: SeoAnalysis;
   performanceAnalysis?: PerformanceAnalysis;
   brandingAnalysis?: BrandingAnalysis;
+  companyDiscovery?: {
+    domain?: string;
+    ip?: string;
+    hostname?: string;
+    mxProviders?: string[];
+    industry?: string;
+    localBusiness: boolean;
+    confidence: number;
+    notes: string[];
+  };
+  brandVision?: { critique: string; captured: boolean };
+  socialSnapshot?: {
+    profiles: { platform: string; url: string; found: boolean; followerText?: string; postCount?: number; bioPresent: boolean; issues: string[] }[];
+    consistencyScore: number;
+    presenceScore: number;
+    summary: string;
+  };
+  competitorSnapshot?: {
+    competitor: { url: string; seo?: any; performance?: any; branding?: any; overallScore: number };
+    gap: { strengths: string[]; weaknesses: string[]; opportunities: string[] };
+  };
   scores?: AuditScores;
   recommendations: AuditRecommendation[];
   executiveSummary?: string;
+  proposal?: {
+    clientName: string;
+    website: string;
+    overallScore: number;
+    headline: string;
+    lineItems: { service: string; description: string; effort: string; price: number }[];
+    subtotal: number;
+    monthlyRetainer: number;
+    estimatedRoi: string;
+    generatedAt: string;
+  };
   error?: string;
   createdAt: string;
   updatedAt: string;

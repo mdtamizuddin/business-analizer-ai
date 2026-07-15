@@ -19,15 +19,22 @@ export const STATUS_COLORS: Record<string, string> = {
 };
 
 export const STAGE_LABELS: Record<string, string> = {
+  company_input: 'Company Input',
   company_discovery: 'Company Discovery',
+  data_collection: 'Data Collection',
+  website_analysis: 'Website Analysis',
   website_crawl: 'Website Crawl',
   seo_analysis: 'SEO Analysis',
   performance_analysis: 'Performance Analysis',
   branding_analysis: 'Branding Analysis',
+  brand_analysis: 'Brand Analysis',
+  social_analysis: 'Social Analysis',
+  competitor_research: 'Competitor Research',
   ai_processing: 'AI Processing',
-  scoring: 'Scoring',
+  business_scoring: 'Business Scoring',
   recommendations: 'Recommendations',
   report_generation: 'Report Generation',
+  sales_proposal: 'Sales Proposal',
 };
 
 export const PRIORITY_LABELS: Record<string, string> = {
