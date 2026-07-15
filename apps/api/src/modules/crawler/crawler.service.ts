@@ -333,4 +333,22 @@ export class CrawlerService {
       }));
     });
   }
+
+  /**
+   * Render an HTML string to a PDF buffer using the bundled Chromium.
+   * Reuses the chromium launcher so no extra browser download is needed.
+   */
+  async htmlToPdf(html: string): Promise<Buffer> {
+    if (!this.browser) {
+      this.browser = await chromium.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      });
+    }
+    const page = await this.browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle' });
+    const pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '20px', bottom: '20px', left: '16px', right: '16px' } });
+    await page.close();
+    return Buffer.from(pdf);
+  }
 }
