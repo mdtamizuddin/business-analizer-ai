@@ -12,6 +12,8 @@ import { AiModule } from './modules/ai/ai.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { CompetitorModule } from './modules/competitor/competitor.module';
+import { SocialModule } from './modules/social/social.module';
+import { GoogleBusinessModule } from './modules/google-business/google-business.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { CompetitorModule } from './modules/competitor/competitor.module';
     AuthModule,
     LeadsModule,
     CompetitorModule,
+    SocialModule,
+    GoogleBusinessModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
