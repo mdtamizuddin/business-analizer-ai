@@ -18,6 +18,7 @@ COPY apps/web ./apps/web
 COPY packages ./packages
 
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV CI=true
 
 RUN pnpm exec turbo build --filter=@abap/web...
 
