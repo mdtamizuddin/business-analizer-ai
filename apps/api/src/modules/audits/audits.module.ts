@@ -8,6 +8,8 @@ import { AuditProcessor } from './processors/audit.processor';
 import { CompaniesModule } from '../companies/companies.module';
 import { CrawlerModule } from '../crawler/crawler.module';
 import { SeoModule } from '../seo/seo.module';
+import { PerformanceModule } from '../performance/performance.module';
+import { BrandingModule } from '../branding/branding.module';
 import { AiModule } from '../ai/ai.module';
 
 @Module({
@@ -17,6 +19,8 @@ import { AiModule } from '../ai/ai.module';
     CompaniesModule,
     CrawlerModule,
     SeoModule,
+    PerformanceModule,
+    BrandingModule,
     AiModule,
   ],
   providers: [AuditsService, AuditProcessor],

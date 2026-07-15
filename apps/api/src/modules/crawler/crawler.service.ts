@@ -26,6 +26,16 @@ export interface CrawledPageResult {
     imageCount?: number;
     wordCount?: number;
   };
+  performanceMetrics?: {
+    lcp?: number;
+    fcp?: number;
+    cls?: number;
+    tbt?: number;
+    si?: number;
+    ttfb?: number;
+    domContentLoaded?: number;
+    loadEvent?: number;
+  };
 }
 
 export interface CrawlResult {
@@ -109,6 +119,11 @@ export class CrawlerService {
             return undefined;
           });
           result.loadTimeMs = navigationTiming;
+
+          // Capture Core Web Vitals on the first (home) page for performance analysis.
+          if (pages.length === 0) {
+            result.performanceMetrics = await this.measurePerformance(page);
+          }
 
           pages.push(result);
 
@@ -243,5 +258,79 @@ export class CrawlerService {
       await this.browser.close();
       this.browser = null;
     }
+  }
+
+  /**
+   * Capture Core Web Vitals + key timing metrics for a loaded page.
+   * Uses the Performance API and LCP/CLS observers. Returns ms-based metrics
+   * that the PerformanceService turns into a Lighthouse-style analysis.
+   */
+  private async measurePerformance(page: import('playwright').Page): Promise<{
+    lcp?: number;
+    fcp?: number;
+    cls?: number;
+    tbt?: number;
+    si?: number;
+    ttfb?: number;
+    domContentLoaded?: number;
+    loadEvent?: number;
+  }> {
+    return page.evaluate(() => {
+      const nav = (performance as any).getEntriesByType('navigation')[0] as any;
+      const ttfb = nav ? nav.responseStart : undefined;
+      const domContentLoaded = nav ? nav.domContentLoadedEventEnd : undefined;
+      const loadEvent = nav ? nav.loadEventEnd : undefined;
+
+      const paint = (performance as any).getEntriesByType('paint');
+      const fcpEntry = paint.find((p: any) => p.name === 'first-contentful-paint');
+      const fcp = fcpEntry ? fcpEntry.startTime : undefined;
+
+      const lcpPromise = new Promise<number | undefined>((resolve) => {
+        let value: number | undefined;
+        try {
+          const po = new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            const last = entries[entries.length - 1] as any;
+            value = last.renderTime ?? last.loadTime ?? last.startTime;
+          });
+          po.observe({ type: 'largest-contentful-paint' as any, buffered: true });
+          setTimeout(() => {
+            po.disconnect();
+            resolve(value);
+          }, 1500);
+        } catch {
+          resolve(undefined);
+        }
+      });
+
+      const clsPromise = new Promise<number | undefined>((resolve) => {
+        let cls = 0;
+        try {
+          const po = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries() as any[]) {
+              if (!entry.hadRecentInput) cls += entry.value;
+            }
+          });
+          po.observe({ type: 'layout-shift' as any, buffered: true });
+          setTimeout(() => {
+            po.disconnect();
+            resolve(cls);
+          }, 1500);
+        } catch {
+          resolve(undefined);
+        }
+      });
+
+      return Promise.all([lcpPromise, clsPromise]).then(([lcp, cls]) => ({
+        ttfb,
+        domContentLoaded,
+        loadEvent,
+        fcp,
+        lcp,
+        cls,
+        tbt: undefined,
+        si: undefined,
+      }));
+    });
   }
 }

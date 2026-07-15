@@ -40,6 +40,9 @@ export class Audit {
   recommendations!: any[];
 
   @Prop()
+  executiveSummary?: string;
+
+  @Prop()
   reportUrl?: string;
 
   @Prop()
