@@ -12,10 +12,10 @@ export class CompaniesService {
     @InjectModel(Company.name) private readonly companyModel: Model<CompanyDocument>,
   ) {}
 
-  async create(dto: CreateCompanyDto): Promise<CompanyDocument> {
+  async create(dto: CreateCompanyDto, organizationId = 'default-org'): Promise<CompanyDocument> {
     const created = new this.companyModel({
       ...dto,
-      organizationId: 'default-org',
+      organizationId,
     });
     const saved = await created.save();
     this.logger.log(`Created company: ${saved.name} (${saved._id})`);

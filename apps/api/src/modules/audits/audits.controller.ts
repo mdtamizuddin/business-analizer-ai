@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException, UseGuards } from '@nestjs/common';
 import { AuditsService } from './audits.service';
 import { CreateAuditDto } from './dto/create-audit.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('audits')
+@UseGuards(JwtAuthGuard)
 export class AuditsController {
   constructor(private readonly auditsService: AuditsService) {}
 
