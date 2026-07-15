@@ -34,7 +34,22 @@ export class Audit {
   brandingAnalysis?: any;
 
   @Prop({ type: Object })
+  companyDiscovery?: any;
+
+  @Prop({ type: Object })
+  brandVision?: any;
+
+  @Prop({ type: Object })
+  socialSnapshot?: any;
+
+  @Prop({ type: Object })
+  competitorSnapshot?: any;
+
+  @Prop({ type: Object })
   scores?: any;
+
+  @Prop({ type: Object })
+  proposal?: any;
 
   @Prop({ type: [Object], default: [] })
   recommendations!: any[];

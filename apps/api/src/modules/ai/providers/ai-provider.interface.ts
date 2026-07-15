@@ -6,6 +6,13 @@ export interface IAIProvider {
     userPrompt: string,
     options?: AIGenerateOptions,
   ): Promise<AIProviderResponse>;
+
+  generateWithImage?(
+    systemPrompt: string,
+    imageBase64: string,
+    prompt: string,
+    options?: AIGenerateOptions,
+  ): Promise<AIProviderResponse>;
 }
 
 export interface AIGenerateOptions {

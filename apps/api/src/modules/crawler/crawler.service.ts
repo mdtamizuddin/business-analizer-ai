@@ -335,6 +335,28 @@ export class CrawlerService {
   }
 
   /**
+   * Capture a full-page screenshot of the given URL and return it as a base64 PNG.
+   * Uses the bundled Chromium so no extra browser is needed.
+   */
+  async takeScreenshot(url: string): Promise<{ base64: string; buffer: Buffer }> {
+    if (!this.browser) {
+      this.browser = await chromium.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      });
+    }
+    const page = await this.browser.newPage({ viewport: { width: 1280, height: 800 } });
+    try {
+      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+    } catch {
+      /* continue even if some assets fail */
+    }
+    const buffer = await page.screenshot({ fullPage: false, type: 'png' });
+    await page.close();
+    return { base64: buffer.toString('base64'), buffer };
+  }
+
+  /**
    * Render an HTML string to a PDF buffer using the bundled Chromium.
    * Reuses the chromium launcher so no extra browser download is needed.
    */

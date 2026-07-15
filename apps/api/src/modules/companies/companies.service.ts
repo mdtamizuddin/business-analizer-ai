@@ -33,4 +33,8 @@ export class CompaniesService {
   async findByWebsite(website: string): Promise<CompanyDocument | null> {
     return this.companyModel.findOne({ website }).exec();
   }
+
+  async update(id: string, updates: Partial<Company>): Promise<CompanyDocument | null> {
+    return this.companyModel.findByIdAndUpdate(id, updates, { new: true }).exec();
+  }
 }

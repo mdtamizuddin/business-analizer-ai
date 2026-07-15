@@ -18,6 +18,15 @@ export class Company {
   @Prop()
   logoUrl?: string;
 
+  @Prop()
+  domain?: string;
+
+  @Prop()
+  competitorUrl?: string;
+
+  @Prop({ default: false })
+  isLocalBusiness?: boolean;
+
   @Prop({ type: [Object], default: [] })
   socialAccounts!: { platform: string; url: string; username?: string }[];
 

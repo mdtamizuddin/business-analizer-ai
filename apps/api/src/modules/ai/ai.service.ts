@@ -79,4 +79,14 @@ export class AiService implements IAIProvider {
       throw new Error('AI returned invalid JSON');
     }
   }
+
+  async generateWithImage(
+    systemPrompt: string,
+    imageBase64: string,
+    prompt: string,
+    options?: AIGenerateOptions,
+  ): Promise<AIProviderResponse> {
+    // Vision is only supported by Gemini in this setup.
+    return this.geminiProvider.generateWithImage(systemPrompt, imageBase64, prompt, options);
+  }
 }

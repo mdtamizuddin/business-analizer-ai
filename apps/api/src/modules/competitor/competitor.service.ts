@@ -38,7 +38,7 @@ export class CompetitorService {
    */
   async analyze(
     competitorUrl: string,
-    baseline: {
+    baseline?: {
       seo?: SEOAnalysisResult | null;
       performance?: PerformanceAnalysisResult | null;
       branding?: BrandingAnalysisResult | null;
@@ -72,13 +72,13 @@ export class CompetitorService {
 
   private buildGapAnalysis(
     comp: { seo: SEOAnalysisResult; performance: PerformanceAnalysisResult; branding: BrandingAnalysisResult; overallScore: number },
-    baseline: { seo?: SEOAnalysisResult | null; performance?: PerformanceAnalysisResult | null; branding?: BrandingAnalysisResult | null },
+    baseline?: { seo?: SEOAnalysisResult | null; performance?: PerformanceAnalysisResult | null; branding?: BrandingAnalysisResult | null },
   ): GapAnalysis {
     const strengths: string[] = [];
     const weaknesses: string[] = [];
     const opportunities: string[] = [];
 
-    if (baseline.seo) {
+    if (baseline?.seo) {
       const bSeo = this.avgSeo(baseline.seo);
       const cSeo = this.avgSeo(comp.seo);
       if (bSeo > cSeo + 5) strengths.push(`Your SEO (${bSeo}) is stronger than competitor's (${cSeo}).`);
@@ -88,7 +88,7 @@ export class CompetitorService {
       }
     }
 
-    if (baseline.performance) {
+    if (baseline?.performance) {
       if (baseline.performance.lighthouseScore > comp.performance.lighthouseScore + 5)
         strengths.push('Your site loads faster (higher Lighthouse) than the competitor.');
       else if (comp.performance.lighthouseScore > baseline.performance.lighthouseScore + 5) {
@@ -97,7 +97,7 @@ export class CompetitorService {
       }
     }
 
-    if (baseline.branding) {
+    if (baseline?.branding) {
       if (baseline.branding.brandScore > comp.branding.brandScore + 5)
         strengths.push('Your visual branding scores higher than the competitor.');
       else if (comp.branding.brandScore > baseline.branding.brandScore + 5) {

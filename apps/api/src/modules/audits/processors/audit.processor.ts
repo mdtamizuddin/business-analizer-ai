@@ -11,6 +11,10 @@ import { BrandingService, BrandingAnalysisResult } from '../../branding/branding
 import { AiService } from '../../ai/ai.service';
 import { CompaniesService } from '../../companies/companies.service';
 import { LeadsService } from '../../leads/leads.service';
+import { SocialService } from '../../social/social.service';
+import { CompetitorService } from '../../competitor/competitor.service';
+import { CompanyDiscoveryService } from '../company-discovery.service';
+import { ProposalService } from '../proposal.service';
 import { buildScoreSet } from '@abap/audit-core';
 import {
   RECOMMENDATIONS_PROMPT,
@@ -43,24 +47,41 @@ export class AuditProcessor extends WorkerHost {
     private readonly aiService: AiService,
     private readonly companiesService: CompaniesService,
     private readonly leadsService: LeadsService,
+    private readonly socialService: SocialService,
+    private readonly competitorService: CompetitorService,
+    private readonly companyDiscoveryService: CompanyDiscoveryService,
+    private readonly proposalService: ProposalService,
   ) {
     super();
   }
 
   async process(job: Job<AuditJobData>): Promise<void> {
-    const { auditId, companyId, crawlDepth, runSeoAudit, runPerformanceAudit, runBrandingAudit, runAiProcessing } = job.data;
+    const { auditId, companyId, crawlDepth, runSeoAudit, runBrandingAudit, runAiProcessing } = job.data;
     this.logger.log(`Processing audit ${auditId} for company ${companyId}`);
 
     try {
-      // Stage 1: Fetch company
-      await this.updateAudit(auditId, { status: 'crawling', currentStage: 'company_discovery' });
+      // Stage 1: Company Input (already created) — fetch company
+      await this.updateAudit(auditId, { status: 'crawling', currentStage: 'company_input' });
       const company = await this.companiesService.findById(companyId);
       if (!company) {
         throw new Error(`Company ${companyId} not found`);
       }
 
-      // Stage 2: Crawl website
-      await this.updateAudit(auditId, { status: 'crawling', currentStage: 'website_crawl' });
+      // Stage 2: Company Discovery (reverse DNS, IP, industry, local verification)
+      await this.updateAudit(auditId, { status: 'crawling', currentStage: 'company_discovery' });
+      const discovery = await this.companyDiscoveryService.discover(
+        (company as any).domain,
+        company.website,
+        company.industry,
+      );
+      await this.updateAudit(auditId, { companyDiscovery: discovery });
+      // Persist enriched industry back to the company
+      try {
+        await this.companiesService.update(companyId, { industry: discovery.industry, isLocalBusiness: discovery.localBusiness });
+      } catch { /* best-effort */ }
+
+      // Stage 3: Data Collection (crawl)
+      await this.updateAudit(auditId, { status: 'crawling', currentStage: 'data_collection' });
       const maxPages = crawlDepth ?? CRAWL_DEFAULTS.MAX_PAGES;
       const crawlResult: CrawlResult = await this.crawlerService.crawl(company.website, maxPages);
       await this.updateAudit(auditId, {
@@ -84,37 +105,78 @@ export class AuditProcessor extends WorkerHost {
         },
       });
 
-      // Stage 3: SEO Analysis
+      // Stage 4: Website Analysis (SEO + Performance + Accessibility/SSL)
       if (runSeoAudit !== false) {
-        await this.updateAudit(auditId, { status: 'analyzing', currentStage: 'seo_analysis' });
+        await this.updateAudit(auditId, { status: 'analyzing', currentStage: 'website_analysis' });
         const seoResult: SEOAnalysisResult = this.seoService.analyze(crawlResult);
-        await this.updateAudit(auditId, { seoAnalysis: seoResult });
-        this.logger.log(`SEO analysis complete for audit ${auditId}: ${seoResult.issues.length} issues found`);
-      }
-
-      // Stage 3b: Performance Analysis
-      if (runPerformanceAudit !== false) {
-        await this.updateAudit(auditId, { status: 'analyzing', currentStage: 'performance_analysis' });
         const perfResult: PerformanceAnalysisResult = this.performanceService.analyze(crawlResult);
-        await this.updateAudit(auditId, { performanceAnalysis: perfResult });
-        this.logger.log(`Performance analysis complete for audit ${auditId}: perf=${perfResult.performanceScore}`);
+        await this.updateAudit(auditId, { seoAnalysis: seoResult, performanceAnalysis: perfResult });
       }
 
-      // Stage 3c: Branding Analysis
+      // Stage 5: Brand Analysis (text signals + Vision AI screenshot critique)
       if (runBrandingAudit !== false) {
-        await this.updateAudit(auditId, { status: 'analyzing', currentStage: 'branding_analysis' });
+        await this.updateAudit(auditId, { status: 'analyzing', currentStage: 'brand_analysis' });
         const brandResult: BrandingAnalysisResult = this.brandingService.analyze(crawlResult);
-        await this.updateAudit(auditId, { brandingAnalysis: brandResult });
-        this.logger.log(`Branding analysis complete for audit ${auditId}: ${brandResult.colorsDetected.length} colors`);
+        let visionCritique = '';
+        try {
+          const shot = await this.crawlerService.takeScreenshot(company.website);
+          visionCritique = await this.aiService.generateWithImage(
+            'You are a senior brand & UX designer. Critique this homepage screenshot for visual layout, grid alignment, color harmony, whitespace, and trust signals. Be concise (max 120 words).',
+            shot.base64,
+            'Critique this homepage for brand and visual quality.',
+            { maxTokens: 300, temperature: 0.5 },
+          ).then((r) => r.content);
+        } catch (visionErr) {
+          this.logger.warn(`Brand vision skipped: ${visionErr instanceof Error ? visionErr.message : visionErr}`);
+        }
+        await this.updateAudit(auditId, {
+          brandingAnalysis: brandResult,
+          brandVision: { critique: visionCritique, captured: !!visionCritique },
+        });
       }
 
-      // Stage 4: AI Processing
+      // Stage 6: Social Analysis (if the company has linked social accounts)
+      const socialAccounts = (company as any)?.socialAccounts ?? [];
+      if (socialAccounts.length > 0) {
+        await this.updateAudit(auditId, { status: 'analyzing', currentStage: 'social_analysis' });
+        try {
+          const social = await this.socialService.analyze(socialAccounts);
+          await this.updateAudit(auditId, { socialSnapshot: social });
+        } catch (e) {
+          this.logger.warn(`Social analysis skipped: ${e instanceof Error ? e.message : e}`);
+        }
+      }
+
+      // Stage 7: Competitor Research (if the company has a competitor URL)
+      const competitorUrl = (company as any)?.competitorUrl;
+      if (competitorUrl) {
+        await this.updateAudit(auditId, { status: 'analyzing', currentStage: 'competitor_research' });
+        try {
+          const comp = await this.competitorService.analyze(competitorUrl);
+          await this.updateAudit(auditId, { competitorSnapshot: comp });
+        } catch (e) {
+          this.logger.warn(`Competitor research skipped: ${e instanceof Error ? e.message : e}`);
+        }
+      }
+
+      // Stage 8: AI Processing (recommendations)
       if (runAiProcessing !== false) {
         await this.updateAudit(auditId, { status: 'ai_processing', currentStage: 'ai_processing' });
         await this.runAiProcessing(auditId, company.name, company.website, company.industry);
       }
 
-      // Stage 5: Complete
+      // Stage 9 + 10: Business Scoring + Recommendations already produced in runAiProcessing.
+      // Stage 11: Report Generation is on-demand (PDF/HTML endpoint); mark pipeline progress.
+      await this.updateAudit(auditId, { status: 'generating_report', currentStage: 'report_generation' });
+
+      // Stage 12: Sales Proposal (ROI + pricing matrix)
+      const auditForProposal = await this.auditModel.findById(auditId).exec();
+      const overall = auditForProposal?.scores?.overall ?? 0;
+      const recs = auditForProposal?.recommendations ?? [];
+      const proposal = await this.proposalService.build(company.name, company.website, overall, recs);
+      await this.updateAudit(auditId, { proposal, currentStage: 'sales_proposal' });
+
+      // Complete
       await this.updateAudit(auditId, {
         status: 'completed',
         currentStage: undefined,
@@ -171,7 +233,7 @@ export class AuditProcessor extends WorkerHost {
     });
 
     try {
-      const { data: rawRecs, raw } = await this.aiService.generateJson(
+      const { data: rawRecs } = await this.aiService.generateJson(
         'premium',
         RECOMMENDATIONS_PROMPT.system,
         recsPrompt,
@@ -204,11 +266,19 @@ export class AuditProcessor extends WorkerHost {
 
       await this.updateAudit(auditId, { recommendations: validatedRecs });
       this.logger.log(
-        `Generated ${validatedRecs.length} recommendations (${raw.tokensUsed} tokens, $${raw.costEstimate.toFixed(5)})`,
+        `Generated ${validatedRecs.length} recommendations`,
       );
     } catch (err) {
       this.logger.warn(`AI recommendation generation failed: ${err instanceof Error ? err.message : err}`);
       // Continue — recommendations are optional, audit can still complete
+    }
+
+    // Fallback: if the AI produced no recommendations (provider unavailable
+    // or returned empty), derive actionable ones from the issues we detected.
+    if (validatedRecs.length === 0) {
+      this.logger.warn('No AI recommendations; building deterministic fallback from detected issues.');
+      validatedRecs = this.buildFallbackRecommendations(audit);
+      await this.updateAudit(auditId, { recommendations: validatedRecs });
     }
 
     // Generate scores from available data
@@ -262,6 +332,51 @@ export class AuditProcessor extends WorkerHost {
         this.logger.warn(`Executive summary generation failed: ${err instanceof Error ? err.message : err}`);
       }
     }
+  }
+
+  /**
+   * Deterministic recommendation generation from already-detected SEO,
+   * performance, and branding issues. Used when the AI provider is
+   * unavailable so the pipeline still yields an actionable deliverable.
+   */
+  private buildFallbackRecommendations(audit: any): any[] {
+    const recs: any[] = [];
+    const seo = audit.seoAnalysis;
+    const perf = audit.performanceAnalysis;
+    const brand = audit.brandingAnalysis;
+
+    const push = (title: string, type: string, problem: string, service: string, priority = 'medium') => {
+      recs.push({
+        id: `fallback-${recs.length}`,
+        type,
+        title,
+        problem,
+        evidence: 'Detected automatically during audit.',
+        businessImpact: 'Improves digital health score and conversion potential.',
+        priority,
+        estimatedEffort: 'Medium',
+        estimatedRoi: 'Positive impact expected.',
+        recommendedService: service,
+      });
+    };
+
+    if (seo?.issues?.length) {
+      seo.issues.slice(0, 5).forEach((issue: string, i: number) =>
+        push(`Fix: ${issue.slice(0, 60)}`, 'seo_improvement', issue, 'SEO Optimization', i === 0 ? 'high' : 'medium'),
+      );
+    }
+    if (perf?.issues?.length) {
+      perf.issues.slice(0, 3).forEach((issue: string) =>
+        push(`Performance: ${issue.slice(0, 60)}`, 'website_improvement', issue, 'Performance Optimization'),
+      );
+    }
+    if (brand && (!brand.logoPresent || !brand.hasFavicon || brand.colorsDetected?.length < 2)) {
+      push('Strengthen brand identity (logo, favicon, color system)', 'branding_improvement', 'Weak brand signals detected.', 'Brand Redesign', 'high');
+    }
+    if (recs.length === 0) {
+      push('Establish a baseline optimization & content plan', 'business_growth', 'No critical issues found; focus on growth.', 'Content Marketing');
+    }
+    return recs;
   }
 
   /**

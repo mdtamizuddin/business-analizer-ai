@@ -71,4 +71,66 @@ export class GeminiProvider implements IAIProvider {
     const costPer1K = 0.000075;
     return (tokens / 1000) * costPer1K;
   }
+
+  async generateWithImage(
+    systemPrompt: string,
+    imageBase64: string,
+    prompt: string,
+    options?: AIGenerateOptions,
+  ): Promise<AIProviderResponse> {
+    const startTime = Date.now();
+
+    if (!this.apiKey) {
+      throw new Error('GEMINI_API_KEY is not configured');
+    }
+
+    const model = 'gemini-1.5-flash';
+    const url = `${this.baseUrl}/models/${model}:generateContent?key=${this.apiKey}`;
+
+    const body = {
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: `${systemPrompt}\n\n${prompt}` },
+            {
+              inlineData: {
+                mimeType: 'image/png',
+                data: imageBase64,
+              },
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        maxOutputTokens: options?.maxTokens ?? 1024,
+        temperature: options?.temperature ?? 0.6,
+        responseMimeType: options?.responseFormat === 'json' ? 'application/json' : 'text/plain',
+      },
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      this.logger.error(`Gemini vision API error ${response.status}: ${errorText}`);
+      throw new Error(`Gemini vision API error: ${response.status}`);
+    }
+
+    const data = await response.json() as any;
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const tokensUsed = data.usageMetadata?.totalTokenCount ?? 0;
+
+    return {
+      content,
+      model,
+      tokensUsed,
+      costEstimate: this.estimateCost(model, tokensUsed),
+      latencyMs: Date.now() - startTime,
+    };
+  }
 }
