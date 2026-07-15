@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Building2, PlusCircle, Users } from 'lucide-react';
+import { LayoutDashboard, Building2, PlusCircle, Users, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { href: '/audits/new', label: 'New Audit', icon: PlusCircle },
   { href: '/companies', label: 'Companies', icon: Building2 },
   { href: '/leads', label: 'Leads', icon: Users },
+  { href: '/competitor', label: 'Competitor', icon: Swords },
 ];
 
 export function Sidebar() {

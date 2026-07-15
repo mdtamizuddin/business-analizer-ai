@@ -24,7 +24,9 @@
       ]
     },
     "allowJs": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": [
     "next-env.d.ts",
