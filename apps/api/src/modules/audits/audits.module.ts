@@ -11,6 +11,7 @@ import { SeoModule } from '../seo/seo.module';
 import { PerformanceModule } from '../performance/performance.module';
 import { BrandingModule } from '../branding/branding.module';
 import { AiModule } from '../ai/ai.module';
+import { LeadsModule } from '../leads/leads.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AiModule } from '../ai/ai.module';
     PerformanceModule,
     BrandingModule,
     AiModule,
+    LeadsModule,
   ],
   providers: [AuditsService, AuditProcessor],
   controllers: [AuditsController],

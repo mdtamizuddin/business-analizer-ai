@@ -10,6 +10,7 @@ import { CrawlerModule } from './modules/crawler/crawler.module';
 import { SeoModule } from './modules/seo/seo.module';
 import { AiModule } from './modules/ai/ai.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { LeadsModule } from './modules/leads/leads.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AuthModule } from './modules/auth/auth.module';
     AiModule,
     AuditsModule,
     AuthModule,
+    LeadsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

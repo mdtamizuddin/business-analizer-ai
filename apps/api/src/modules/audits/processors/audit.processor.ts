@@ -10,6 +10,7 @@ import { PerformanceService, PerformanceAnalysisResult } from '../../performance
 import { BrandingService, BrandingAnalysisResult } from '../../branding/branding.service';
 import { AiService } from '../../ai/ai.service';
 import { CompaniesService } from '../../companies/companies.service';
+import { LeadsService } from '../../leads/leads.service';
 import { buildScoreSet } from '@abap/audit-core';
 import {
   RECOMMENDATIONS_PROMPT,
@@ -41,6 +42,7 @@ export class AuditProcessor extends WorkerHost {
     private readonly brandingService: BrandingService,
     private readonly aiService: AiService,
     private readonly companiesService: CompaniesService,
+    private readonly leadsService: LeadsService,
   ) {
     super();
   }
@@ -119,6 +121,24 @@ export class AuditProcessor extends WorkerHost {
         completedAt: new Date(),
       });
       this.logger.log(`Audit ${auditId} completed successfully`);
+
+      // Audit → Lead conversion: auto-create a tracked lead for the company
+      try {
+        await this.leadsService.create(
+          {
+            name: company.name,
+            email: undefined,
+            source: 'audit',
+            companyId: company._id?.toString?.() ?? companyId,
+            auditId,
+            estimatedValue: company.industry ? 2500 : undefined,
+          },
+          company.organizationId ?? 'default-org',
+        );
+        this.logger.log(`Auto-created lead for company ${company.name}`);
+      } catch (leadErr) {
+        this.logger.warn(`Lead auto-creation skipped: ${leadErr instanceof Error ? leadErr.message : leadErr}`);
+      }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Audit ${auditId} failed: ${errorMsg}`);
